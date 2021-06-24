@@ -1,0 +1,22 @@
+function anatomy() {
+  var targets = [
+    0x002643ea, 0x0025a3ad, 0x00259c7b, 0x00267cfb, 0x0026440e, 0x00257872,
+  ];
+  while (!Player.Dead()) {
+    targets.forEach(function (_target) {
+    hungry();
+      if (Orion.ObjectExists(_target)) {
+        Orion.UseSkill("Anatomy");
+        if (Orion.WaitForTarget()) {
+          Orion.TargetObject(_target);
+          Orion.WaitJournal(
+            "not sure|somewhat|Stamina",
+            Orion.Now(),
+            Orion.Now() + 1000
+          );
+          Orion.Wait(12 * 1000);
+        }
+      }
+    });
+  }
+}

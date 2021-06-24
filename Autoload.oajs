@@ -1,0 +1,38 @@
+//#include ZHE/helpers.oajs
+//#include ZHE/heal.oajs
+//#include ZHE/skills.oajs
+// Types
+CLEAN_BANDAGES = 0x0e21;
+//// Healing
+// Health % to start healing
+HEALING_THRESHOLD = 85;
+
+//// Attack
+function Autostart() {
+  Orion.Exec('autoheal', true);
+}
+function attack_nts() {
+  _target = Orion.TargetSystemSerial();
+  if (_target) {
+    _enemy = Orion.FindObject(_target);
+    if (_enemy) {
+      Orion.CharPrint(_enemy.Serial(), 53, "> Target <");
+      if (!Player.WarMode()) Orion.WarMode(true);
+      Orion.Attack(_target);
+    }
+  }
+}
+
+function unwar() {
+  var shield = 0x1b76;
+  while (!Player.Dead()) {
+    if (!Orion.ObjAtLayer("LeftHand")) {
+      if (Orion.FindType(shield)) {
+        Orion.EquipT(shield);
+        Orion.Wait(500);
+      }
+    }
+    if (Player.WarMode() == true) Orion.WarMode(false);
+    Orion.Wait(100);
+  }
+}

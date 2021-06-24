@@ -1,0 +1,39 @@
+function hungry(level) {
+  // Cooked fish steaks
+  var food = 0x097b;
+  var level = typeof level !== "undefined" ? level : 90;
+
+  while (Player.Luck() < level) {
+    if (Orion.Count(food) > 5) {
+      Orion.UseType(food);
+      Orion.Wait(1000);
+    } else {
+      Orion.Print("No more steaks left!");
+      break;
+    }
+    Orion.Wait(100);
+  }
+}
+
+// Print message above characters head
+function self_print(message, color) {
+  // Thank you, stripped version of JS, now I have to use ternary insted of default param value definition
+  color = typeof color !== "undefined" ? color : 20;
+  Orion.CharPrint(Player.Serial(), color, message);
+}
+
+function dummy()
+{
+	while (!Player.Dead())
+	{
+		var dummys = Orion.FindType(0x1070, 0x0000, 'ground');
+		if(dummys.length > 0)
+		{
+			dummys.forEach(function(dummy){
+				Orion.UseObject(dummy);
+				Orion.Wait(1000);
+			});
+			Orion.Wait(10 * 1000);
+		}
+	}
+}
