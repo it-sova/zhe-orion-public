@@ -1,0 +1,36 @@
+ // Print message above characters head
+function self_print(message, color) {
+  // Thank you, stripped version of JS, now I have to use ternary insted of default param value definition
+  color = typeof color !== "undefined" ? color : 20;
+  Orion.CharPrint(Player.Serial(), color, message);
+}
+
+function notify(msg, repeats) {
+  self_print(msg, 2190);
+  for (_i=0;_i<repeats;_i++) {
+    Orion.PlayWav(NOTIFY_SOUND);
+    Orion.Wait(700);
+  }
+}
+
+function alert(msg, repeats) {
+  self_print(msg);
+  for (_i=0;_i<repeats;_i++) {
+    Orion.PlayWav(ALERT_SOUND);
+    Orion.Wait(700);
+  }
+}
+
+function discord_post(message) {
+  DISCORD_WEBHOOK = "https://discord.com/api/webhooks/859802160363864065/pp3g-J31SBHJe9xtGwETTtgvN6oVcewJkmZqT1vS3FlbPauniEK917UB2LsljUo8I9cs";
+  var paramText = "content=["+Player.Name()+"]   ";
+  Orion.HttpPost(DISCORD_WEBHOOK, paramText+message);
+}
+
+function color_picker() {
+	for (_i = 0; _i<0xffff;_i+=10) {
+		Orion.Wait(10);
+		Orion.Print(_i, _i);
+		if (_i % 100 == 0) Orion.Wait(500);
+	}
+}

@@ -1,0 +1,121 @@
+function watch_durability() {
+	const low_durability = 20;
+	Orion.Print('Durability warning at: '+low_durability+'%');
+    while (true) {
+        durability_check(low_durability);
+        Orion.Wait(10000);
+    }
+}
+
+function watch_death() {
+	while ( !Player.Dead()  ) {
+	   Orion.Wait(5000)
+	}
+	discord_post(' :cry: Dead at X: '+Player.X()+' Y: '+Player.Y());
+	while (Player.Dead()) {
+	    Orion.Wait(5000)
+	}
+}
+
+function auto_guards() {
+    while (true) {
+        if (Orion.InJournal('is attacking you!*', '', 0, 'any', Orion.Now() - 2000)) {
+            Orion.Say('.guards');
+        }
+        Orion.Wait(1000);
+    }
+}
+
+function auto_hungry() {
+	while (true) {
+		hungry(90);
+		Orion.Wait(5 * 10 * 1000);
+	}
+}
+
+function lag_watch() {
+	latency_gump_creator();
+	while (true) {
+		lag_check();
+		Orion.Wait(10000);
+	}
+
+}
+
+function lag_check(unused) {
+	const lat_max = 1000;
+	const lat_min = 100;
+	const width_max = 180;
+	const width_min = 10;
+	const green = '#66ff66';
+	const yellow = '#ffff00';
+	const red = '#ff0000';
+	const green_text = 70;
+	const yellow_text = 50;
+	const red_text = 30;
+	
+	var request_timestamp = Orion.Now();
+	Orion.Say('.online');
+	var reply = Orion.WaitJournal('Sys. Load', request_timestamp, request_timestamp+5000);
+	var latency = reply.Timer() - request_timestamp;
+	// Orion.Print('latency = '+latency);
+   var color = green;	
+   var text_color = green_text;
+	if (latency>0.3*lat_max) {
+	   color = yellow;
+	   text_color = yellow_text;
+	}
+	if (latency>0.5*lat_max) {
+	   color = red;
+	   text_color = red_text;
+	}
+	if (latency > lat_max) {
+		width = max_width;
+	} else {
+	   width = latency / lat_max * width_max;
+	}
+	var lat_text = latency+'ms';
+	
+	const regex = /(\d\d?%)/g;
+	if (reply) {
+		var _matches = reply.Text().match(regex);
+		var load = _matches[0];
+	}
+		
+	sysload_text = 'Load: '+load;
+	var gump = Orion.CreateCustomGump(1488);
+	gump.AddColoredPolygone(10, 10, width, 10, color, 0, 5, 1, 55);
+
+	gump.AddTextEntry(56, 10, 25, text_color, lat_text, 50, 50, 10);
+	// customGump.AddTextEntry(serial, x, y, 'color', 'text', width, height, maxLength);
+	gump.AddTextEntry(57, 55, 25, text_color, sysload_text, 100, 50, 10);
+	gump.Update();
+	
+}
+
+function latency_gump_callback(unused) {
+	var code = CustomGumpResponse.ReturnCode();
+	if (code == 0)
+	{
+		var gump = Orion.CreateCustomGump(1488);
+		gump.Close();
+	}	
+}
+
+function latency_gump_creator() {
+	// Orion.Print('Hello from latency_gump_creator');
+	var gump = Orion.CreateCustomGump(1488); // Create new custom gump with serial 1488
+	gump.SetNoClose(true); 	// This gump will be no closable by a right mouse click
+	gump.Clear(); // Clear gump cpntents (for rebuilds)
+	gump.SetCallback('latency_gump_callback'); // Set callback function
+	
+	gump.AddResizepic(0, 0, '13BE', 200, 50);  // Main background
+	gump.AddButton(0, 170, 23, '0x00FC', '0x00FD', '0x00FD', '0')
+	poly_color = 400
+	poly_width = 180
+	// customGump.AddColoredPolygone(x, y, width, height, 'color', scopeOnly, lineWidth, smooth, serial);
+	gump.AddColoredPolygone(10, 10, poly_width, 10, poly_color, 0, 5, 1, 55);
+	// gump.AddButton(102, 145, 35, '0x00FC', '0x00FD', '0x00FD', '0')
+	gump.Update();
+	
+}

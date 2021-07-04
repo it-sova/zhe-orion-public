@@ -1,22 +1,72 @@
 function anatomy() {
-  var targets = [
-    0x002643ea, 0x0025a3ad, 0x00259c7b, 0x00267cfb, 0x0026440e, 0x00257872,
-  ];
-  while (!Player.Dead()) {
-    targets.forEach(function (_target) {
-    hungry();
-      if (Orion.ObjectExists(_target)) {
-        Orion.UseSkill("Anatomy");
-        if (Orion.WaitForTarget()) {
-          Orion.TargetObject(_target);
-          Orion.WaitJournal(
-            "not sure|somewhat|Stamina",
-            Orion.Now(),
-            Orion.Now() + 1000
-          );
-          Orion.Wait(12 * 1000);
-        }
-      }
-    });
-  }
+	var targets = [
+		0x0026B653,
+	];
+	while (!Player.Dead()) {
+		targets.forEach(function (_target) {
+			if (Orion.ObjectExists(_target)) {
+				Orion.UseSkill("Anatomy");
+				if (Orion.WaitForTarget()) {
+					Orion.TargetObject(_target);
+					Orion.WaitJournal(
+						"not sure|somewhat|Stamina",
+						Orion.Now(),
+						Orion.Now() + 1000
+					);
+					Orion.Wait(12 * 1000);
+				}
+			}
+		});
+	}
 }
+
+function anatomy_spiritspeak() {
+	while (!Player.Dead()) {
+		Orion.UseSkill('Anatomy');
+		if (Orion.WaitForTarget()) {
+			Orion.TargetObject(0x0027E1A6);
+			if (Orion.WaitJournal("not sure|weak|agile|omewhat|xtremely|cure|poison|anatomy again", Orion.Now(), Orion.Now() + 1000)) {
+				if (Orion.InJournal('anatomy again', '', 0, 'any', Orion.Now() - 2000)) {
+					Orion.Print('Have to Wait');
+					Orion.Wait(10000);
+					Orion.UseSkill('Spirit Speak');
+				}
+			}
+		}
+		Orion.Wait(1000);
+	}
+}
+
+
+function spirit_speak() {
+	ss_wait = 10 * 1000 + 100
+	delay = 100
+	while (true) {
+		Orion.UseSkill('Spirit Speak')
+		Orion.Wait(delay);
+		if (Orion.InJournal('You have to wait to contact', '', 0, 'any', Orion.Now() - 2 * delay)) {
+			Orion.Print('Have to Wait');
+		}
+		Orion.Wait(ss_wait);
+
+		// JournalMessage Orion.InJournal('pattern', 'flags', 'serial', 'color', startTime, endTime)
+	}
+}
+
+function dummy()
+{
+	while (!Player.Dead())
+	//while (Orion.SkillValue('Tactics')<700)
+	{
+		var dummys = Orion.FindType(0x1070, 0x0000, 'ground');
+		if(dummys.length > 0)
+		{
+			dummys.forEach(function(dummy){
+				Orion.UseObject(dummy);
+				Orion.Wait(1000);
+			});
+			Orion.Wait(2 * 1000);
+		}
+	}
+}
+

@@ -1,0 +1,63 @@
+//function ttimer() {
+//  const TIMER_X = 1175
+//  const TIMER_Y = 550
+//	 test_timer(10000)
+//}
+
+function test_timer(msec) {
+  Orion.AddDisplayTimer("healing", msec, "custom", "LineBar", "Healing...", TIMER_X, TIMER_Y);
+  Orion.DisplayTimerSetIcon("healing", "Left", "0x0E21");
+  Orion.DisplayTimerSetSize("healing", 100, 30);
+}
+
+function test_notify() {
+	notify('aaa', 3)
+}
+
+function test_discord() {
+   if (Orion.Connected()) {
+      discord_post("Some polish.");
+	} else {
+	   discord_post("Some polish."); 
+	}
+}
+
+function test_name_profile() {
+	Orion.Print('my name is '+Player.Name());
+	Orion.Print('my profile is '+Player.Profile());
+}
+
+
+// function test_val() {
+// 	Orion.Print(Orion.SkillValue('Tactics'));
+// }
+
+ function test_sound(){
+     Orion.PlayWav('/home/gff/games/orion-native/OA/reminder.wav');
+ }
+
+// function notify_test() {
+//     repeats = 3
+//     self_print('test', 2190);
+//     for (_i = 0; _i < repeats; _i++) {
+//         Orion.PlayWav(NOTIFY_SOUND);
+//         Orion.Wait(700);
+//     }
+// }
+
+
+// //Send message to:
+
+// // Discord
+// var bot = "Webhook url here"; // Webhook url
+// var paramText = "content=";
+
+// Orion.HttpPost(bot, paramText + "Test message");
+
+// // Telegram
+// var bot = "https://api.telegram.org/botTOKEN/sendMessage"; // "TOKEN" change to your bot token
+// var paramID = "chat_id=" + "Telegram chat id here";
+// var paramText = "text=";
+// var params = paramID + "&" + paramText;
+
+// Orion.HttpPost(bot, params + "Test message");
