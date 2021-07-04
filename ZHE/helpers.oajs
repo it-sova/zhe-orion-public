@@ -1,39 +1,33 @@
 function hungry(level) {
-  // Cooked fish steaks
-  var food = 0x097b;
-  var level = typeof level !== "undefined" ? level : 90;
-
-  while (Player.Luck() < level) {
-    if (Orion.Count(food) > 5) {
-      Orion.UseType(food);
-      Orion.Wait(1000);
-    } else {
-      Orion.Print("No more steaks left!");
-      break;
-    }
-    Orion.Wait(100);
-  }
-}
-
-// Print message above characters head
-function self_print(message, color) {
-  // Thank you, stripped version of JS, now I have to use ternary insted of default param value definition
-  color = typeof color !== "undefined" ? color : 20;
-  Orion.CharPrint(Player.Serial(), color, message);
-}
-
-function dummy()
-{
-	while (!Player.Dead())
-	{
-		var dummys = Orion.FindType(0x1070, 0x0000, 'ground');
-		if(dummys.length > 0)
-		{
-			dummys.forEach(function(dummy){
-				Orion.UseObject(dummy);
-				Orion.Wait(1000);
-			});
-			Orion.Wait(10 * 1000);
-		}
+	// Cooked fish steaks
+	var food = 0x097b;
+	var level = typeof level !== "undefined" ? level : 90;
+	var _food_count = Orion.Count(food)
+	if ( _food_count < 20) {
+	   self_print(' ['+_food_count-1 + "] food left!");
 	}
+	while (Player.Luck() < level && Orion.Count(food)) {
+			Orion.UseType(food);
+			Orion.Wait(1000);
+	}
+}
+
+// checks all the layers, in case any is below {floor} executes notify()
+function durability_check(floor){
+  const regex = /(\d\d\d?)/g;
+  for (var i = 0; i < 24; i++) {
+      obj = Orion.ObjAtLayer(i);
+      if (!obj) continue;
+      var props = obj.Properties();
+      if (!Orion.Contains(props, "Durability")) continue;
+      var props_array = props.split("\n");
+      var durability_string = props_array[props_array.length - 1].slice(11);
+      var _matches = durability_string.match(regex);
+      var current_dura = _matches[0];
+      var max_dura = _matches[1];
+      // Orion.Print(current_dura+' of '+max_dura);
+      var percentage = current_dura / max_dura * 100;
+      // Orion.Print(props_array[0]+' is '+percentage.toFixed(0)+'%')
+      if (percentage < floor) notify(props_array[0]+' is '+percentage.toFixed(0)+'%');
+  }
 }
