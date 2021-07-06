@@ -1,6 +1,38 @@
+function parrying() {
+	var _shield_type = 0x1B74;
+	while (true) {
+		if (!Orion.ObjAtLayer('LeftHand') && !Player.Dead()) {
+			Orion.EquipT(_shield_type);
+			Orion.Wait(750);
+		}
+	}
+}
+
+function battle_anatomy() {
+
+	while (!Player.Dead()) {
+		//Orion.Print(Orion.ClientLastAttack());
+		//_target = Orion.FindObject(Orion.ClientLastAttack());
+		_target = Orion.ClientLastAttack();
+		if (Orion.ObjectExists(_target)) {
+			Orion.UseSkill("Anatomy");
+			if (Orion.WaitForTarget()) {
+				Orion.TargetObject(_target);
+				Orion.WaitJournal("not sure|somewhat|Stamina", Orion.Now(), Orion.Now() + 1000);
+				Orion.Wait(20 * 1000);
+			} else {
+				Orion.Wait(5000);
+			}
+		} else {
+			// Orion.Print('battle target doesnt exist');
+			Orion.Wait(1000);
+		}
+	}
+}
+
 function anatomy() {
 	var targets = [
-		0x0026B653,
+		0x0023A0E7,
 	];
 	while (!Player.Dead()) {
 		targets.forEach(function (_target) {
@@ -53,15 +85,13 @@ function spirit_speak() {
 	}
 }
 
-function dummy()
-{
+function dummy() {
 	while (!Player.Dead())
 	//while (Orion.SkillValue('Tactics')<700)
 	{
 		var dummys = Orion.FindType(0x1070, 0x0000, 'ground');
-		if(dummys.length > 0)
-		{
-			dummys.forEach(function(dummy){
+		if (dummys.length > 0) {
+			dummys.forEach(function (dummy) {
 				Orion.UseObject(dummy);
 				Orion.Wait(1000);
 			});

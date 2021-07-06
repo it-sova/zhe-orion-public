@@ -1,33 +1,95 @@
 function hungry(level) {
-	// Cooked fish steaks
-	var food = 0x097b;
-	var level = typeof level !== "undefined" ? level : 90;
-	var _food_count = Orion.Count(food)
-	if ( _food_count < 20) {
-	   self_print(' ['+_food_count-1 + "] food left!");
-	}
-	while (Player.Luck() < level && Orion.Count(food)) {
-			Orion.UseType(food);
-			Orion.Wait(1000);
-	}
+    var level = typeof level !== "undefined" ? level : 90;
+    var _food_count = 0;
+
+    var food_types = "0x097b|0x09B7";
+    _food_count = count_multi_types(food_types);
+    if (_food_count < 20) {
+        self_print("[" + _food_count + "] food left!");
+    }
+    while (Player.Luck() < level && _food_count) {
+        _food_count = count_multi_types(food_types);
+        Orion.UseType(food_types);
+        Orion.Wait(1000);
+    }
+}
+
+function count_multi_types(types) {
+    var _obj_counts = 0
+    var _objects = Orion.FindTypeEx(types, "any", "backpack", "item");
+    for (var _i = 0; _i < _objects.length; _i++) {
+        _obj_counts += _objects[_i].Count();
+    }
+    return _obj_counts;
 }
 
 // checks all the layers, in case any is below {floor} executes notify()
-function durability_check(floor){
-  const regex = /(\d\d\d?)/g;
-  for (var i = 0; i < 24; i++) {
-      obj = Orion.ObjAtLayer(i);
-      if (!obj) continue;
-      var props = obj.Properties();
-      if (!Orion.Contains(props, "Durability")) continue;
-      var props_array = props.split("\n");
-      var durability_string = props_array[props_array.length - 1].slice(11);
-      var _matches = durability_string.match(regex);
-      var current_dura = _matches[0];
-      var max_dura = _matches[1];
-      // Orion.Print(current_dura+' of '+max_dura);
-      var percentage = current_dura / max_dura * 100;
-      // Orion.Print(props_array[0]+' is '+percentage.toFixed(0)+'%')
-      if (percentage < floor) notify(props_array[0]+' is '+percentage.toFixed(0)+'%');
-  }
+function durability_check(floor) {
+    // for future upgrades
+    //Dagger has been destroyed.
+    //Homunculus lost weapon and can barely hit anyones anymore!
+    const regex = /(\d\d?\d?)/g;
+    for (var i = 0; i < 24; i++) {
+        obj = Orion.ObjAtLayer(i);
+        if (!obj) continue;
+        var props = obj.Properties();
+        if (!Orion.Contains(props, "Durability")) continue;
+        var props_array = props.split("\n");
+        var durability_string = props_array[props_array.length - 1].slice(11);
+        var _matches = durability_string.match(regex);
+        var current_dura = _matches[0];
+        var max_dura = _matches[1];
+        // Orion.Print(current_dura+' of '+max_dura);
+        var percentage = current_dura / max_dura * 100;
+        // Orion.Print(props_array[0]+' is '+percentage.toFixed(0)+'%')
+        if (percentage < floor) notify(props_array[0] + ' is ' + percentage.toFixed(0) + '%');
+    }
 }
+
+function safe_move(item, to) {
+
+    _item_obj = Orion.FindObject(item);
+    if (!_item_obj) {
+       Orion.Print('ERROR null item in safe_move()');
+       return false;
+    }
+    _current_item_container = _item_obj.Container();
+    _try = 0;
+    while (_item_obj.Container() == _current_item_container) {
+        Orion.Print("moving... " + _try);
+        _try++;
+        if (_try > 1) {
+            //if (!Orion.InLOS(_item_obj.Container())) {
+            //	Orion.CharPrint(_item_obj.Container(), 70, 'Not in LOS!');
+            //}
+            return;
+        }
+        if (_try > 3)
+            return;
+        Orion.DropDraggedItem();
+
+        Orion.Wait(50);
+        Orion.MoveItem(item, 0, to);
+        Orion.Wait(750);
+    }
+}
+
+function good_item(item) {
+    gold_type = 0x0EED;
+    if (!item) {
+       Orion.Print('ERROR null item in good_item()');
+       return false;
+    }
+    if (item.Graphic() == gold_type) {
+        var _earned = load_from_file(GOLD_FILE_PATH);
+        _earned += item.Count();
+        save_to_file(GOLD_FILE_PATH, _earned);
+    }
+    return true;
+}
+//function stat_exp() {
+//  if (InJournal('опыта') ) {
+//   
+//   }
+//}
+

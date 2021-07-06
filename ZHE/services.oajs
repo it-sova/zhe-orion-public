@@ -1,29 +1,78 @@
+function loot_new_age() {
+
+	var contents;
+	var corpse;
+	Orion.IgnoreReset();
+	while (true) {
+		while (Player.Dead()) Orion.Wait(100);
+		corpse = Orion.FindTypeEx("0x2006|0x0ECC", "any", "ground", "ignoreself|item", 3);
+		for (var c = 0; c < corpse.length; c++) {
+			if (Player.Dead()) break;
+			if (true) {
+				Orion.OpenContainer(corpse[c].Serial())
+				Orion.Wait(50);
+				var _get_content_try = 0
+				contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
+				while (!contents.length) {
+					_get_content_try++;
+					Orion.Wait(50);
+					contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
+					if (_get_content_try > 3) {
+						Orion.Print('No content.')
+						Orion.Ignore(corpse[c].Serial());
+						break
+					}
+				}
+				if (!contents.length) continue;
+				for (var _i = 0; _i < contents.length; _i++) {
+					if (good_item(contents[_i])) {
+						// Orion.CharPrint(corpse[c].Serial(), 70, 'Loot me!');
+						safe_move(contents[_i].Serial(), 'loot_bag');
+						if (!Orion.InLOS(corpse[c].Serial())) {
+							Orion.CharPrint(corpse[c].Serial(), 70, 'Not in LOS!');
+							Orion.Ignore(corpse[c].Serial());
+							break
+						}
+					}
+				}
+				Orion.Wait(10);
+				Orion.Ignore(corpse[c].Serial());
+				 //Orion.Print('Earned: ' + global_GOLD_EARNED);
+			} else {
+				Orion.Print('failed to open');
+				Orion.Wait(10);
+			}
+		}
+		Orion.Wait(100);
+	}
+}
+
+
 function watch_durability() {
-	const low_durability = 20;
-	Orion.Print('Durability warning at: '+low_durability+'%');
-    while (true) {
-        durability_check(low_durability);
-        Orion.Wait(10000);
-    }
+	Orion.Print('Durability warning at: ' + DURABILITY_THRESHOLD + '%');
+	while (true) {
+		durability_check(DURABILITY_THRESHOLD);
+		Orion.Wait(10000);
+	}
 }
 
 function watch_death() {
-	while ( !Player.Dead()  ) {
-	   Orion.Wait(5000)
+	while (!Player.Dead()) {
+		Orion.Wait(5000)
 	}
-	discord_post(' :cry: Dead at X: '+Player.X()+' Y: '+Player.Y());
+	discord_post(' :cry: Dead at X: ' + Player.X() + ' Y: ' + Player.Y());
 	while (Player.Dead()) {
-	    Orion.Wait(5000)
+		Orion.Wait(5000)
 	}
 }
 
 function auto_guards() {
-    while (true) {
-        if (Orion.InJournal('is attacking you!*', '', 0, 'any', Orion.Now() - 2000)) {
-            Orion.Say('.guards');
-        }
-        Orion.Wait(1000);
-    }
+	while (true) {
+		if (Orion.InJournal('is attacking you!*', '', 0, 'any', Orion.Now() - 2000)) {
+			Orion.Say('.guards');
+		}
+		Orion.Wait(1000);
+	}
 }
 
 function auto_hungry() {
@@ -53,36 +102,42 @@ function lag_check(unused) {
 	const green_text = 70;
 	const yellow_text = 50;
 	const red_text = 30;
-	
+
 	var request_timestamp = Orion.Now();
 	Orion.Say('.online');
-	var reply = Orion.WaitJournal('Sys. Load', request_timestamp, request_timestamp+5000);
-	var latency = reply.Timer() - request_timestamp;
-	// Orion.Print('latency = '+latency);
-   var color = green;	
-   var text_color = green_text;
-	if (latency>0.3*lat_max) {
-	   color = yellow;
-	   text_color = yellow_text;
+	var reply = Orion.WaitJournal('Sys. Load', request_timestamp, request_timestamp + 5000);
+	var latency
+	if (!reply) {
+		latency = 5000;
+	} else {
+		latency = reply.Timer() - request_timestamp;
 	}
-	if (latency>0.5*lat_max) {
-	   color = red;
-	   text_color = red_text;
+	// Orion.Print('latency = '+latency);
+	var color = green;
+	var text_color = green_text;
+
+	if (latency > 0.3 * lat_max) {
+		color = yellow;
+		text_color = yellow_text;
+	}
+	if (latency > 0.5 * lat_max) {
+		color = red;
+		text_color = red_text;
 	}
 	if (latency > lat_max) {
-		width = max_width;
+		width = width_max;
 	} else {
-	   width = latency / lat_max * width_max;
+		width = latency / lat_max * width_max;
 	}
-	var lat_text = latency+'ms';
-	
+	var lat_text = latency + 'ms';
+
 	const regex = /(\d\d?%)/g;
 	if (reply) {
 		var _matches = reply.Text().match(regex);
 		var load = _matches[0];
 	}
-		
-	sysload_text = 'Load: '+load;
+
+	sysload_text = 'Load: ' + load;
 	var gump = Orion.CreateCustomGump(1488);
 	gump.AddColoredPolygone(10, 10, width, 10, color, 0, 5, 1, 55);
 
@@ -90,16 +145,15 @@ function lag_check(unused) {
 	// customGump.AddTextEntry(serial, x, y, 'color', 'text', width, height, maxLength);
 	gump.AddTextEntry(57, 55, 25, text_color, sysload_text, 100, 50, 10);
 	gump.Update();
-	
+
 }
 
 function latency_gump_callback(unused) {
 	var code = CustomGumpResponse.ReturnCode();
-	if (code == 0)
-	{
+	if (code == 0) {
 		var gump = Orion.CreateCustomGump(1488);
 		gump.Close();
-	}	
+	}
 }
 
 function latency_gump_creator() {
@@ -108,7 +162,7 @@ function latency_gump_creator() {
 	gump.SetNoClose(true); 	// This gump will be no closable by a right mouse click
 	gump.Clear(); // Clear gump cpntents (for rebuilds)
 	gump.SetCallback('latency_gump_callback'); // Set callback function
-	
+
 	gump.AddResizepic(0, 0, '13BE', 200, 50);  // Main background
 	gump.AddButton(0, 170, 23, '0x00FC', '0x00FD', '0x00FD', '0')
 	poly_color = 400
@@ -117,5 +171,5 @@ function latency_gump_creator() {
 	gump.AddColoredPolygone(10, 10, poly_width, 10, poly_color, 0, 5, 1, 55);
 	// gump.AddButton(102, 145, 35, '0x00FC', '0x00FD', '0x00FD', '0')
 	gump.Update();
-	
+
 }
