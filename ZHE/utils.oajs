@@ -34,3 +34,25 @@ function color_picker() {
 		if (_i % 100 == 0) Orion.Wait(500);
 	}
 }
+
+function value_in_array(v,arr) {
+    for (_i=0;_i<arr.length;_i++){
+        if (v.indexOf(arr[_i]) !== -1) return true;
+    }
+    return false;
+}
+
+function save_to_file(path, data) {
+	var _file = Orion.NewFile();
+	_file.Open(path);
+   _file.Write(data);
+   _file.Close();
+}
+
+function load_from_file(path) {
+	var _file = Orion.NewFile();
+	_file.Open(path);
+   var result = parseInt(_file.Read());
+   _file.Close();
+   return result;
+}

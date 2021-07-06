@@ -4,27 +4,43 @@
 //	 test_timer(10000)
 //}
 
+//function test_los() {
+//	Orion.SetLOSOptions("pollosthroughtwindows"); //|polusenoshoot");
+//	item = '0x4C10B1B5';
+//	Orion.Print(Orion.InLOS(item));
+//}
+
+function test_round() {
+
+   a = 1122334455
+   b = a / 100000
+   Orion.Print(b);
+   c = parseFloat(b).toFixed(2);
+   Orion.Print(c);
+
+}
+
 function test_timer(msec) {
-  Orion.AddDisplayTimer("healing", msec, "custom", "LineBar", "Healing...", TIMER_X, TIMER_Y);
-  Orion.DisplayTimerSetIcon("healing", "Left", "0x0E21");
-  Orion.DisplayTimerSetSize("healing", 100, 30);
+   Orion.AddDisplayTimer("healing", msec, "custom", "LineBar", "Healing...", TIMER_X, TIMER_Y);
+   Orion.DisplayTimerSetIcon("healing", "Left", "0x0E21");
+   Orion.DisplayTimerSetSize("healing", 100, 30);
 }
 
 function test_notify() {
-	notify('aaa', 3)
+   notify('aaa', 3)
 }
 
 function test_discord() {
    if (Orion.Connected()) {
       discord_post("Some polish.");
-	} else {
-	   discord_post("Some polish."); 
-	}
+   } else {
+      discord_post("Some polish.");
+   }
 }
 
 function test_name_profile() {
-	Orion.Print('my name is '+Player.Name());
-	Orion.Print('my profile is '+Player.Profile());
+   Orion.Print('my name is ' + Player.Name());
+   Orion.Print('my profile is ' + Player.Profile());
 }
 
 
@@ -32,9 +48,9 @@ function test_name_profile() {
 // 	Orion.Print(Orion.SkillValue('Tactics'));
 // }
 
- function test_sound(){
-     Orion.PlayWav('/home/gff/games/orion-native/OA/reminder.wav');
- }
+function test_sound() {
+   Orion.PlayWav('/home/gff/games/orion-native/OA/reminder.wav');
+}
 
 // function notify_test() {
 //     repeats = 3

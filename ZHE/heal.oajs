@@ -19,7 +19,7 @@ function autoheal() {
         Orion.Say(".bandageself");
         if (_healing_time > 0 && !_poisoned) add_healing_timer(_healing_time);
         Orion.WaitJournal("Bloody Bandages|cure|poison", Orion.Now(), Orion.Now() + 10 * 1000);
-        if (_bandages_count < 50) self_print(' ['+_bandages_count-1 + "] bandages left!");
+        if (_bandages_count < 50) self_print(' [' + _bandages_count - 1 + "] bandages left!");
         _healing_finished = Orion.Now();
         if (!_poisoned) _healing_time = _healing_finished - _healing_started;
         // Orion.Print("_poisoned == " + _poisoned + " _healing_time == " + _healing_time);
@@ -27,10 +27,10 @@ function autoheal() {
         Orion.Wait(200);
       }
     } else {
-    	if (Player.Dead()) {
-          self_print("I'm dead, pausing script");
-          while (Player.Dead()) Orion.Wait(1000);
-       }
+      if (Player.Dead()) {
+        self_print("I'm dead, pausing script");
+        while (Player.Dead()) Orion.Wait(1000);
+      }
       self_print("!!! No more bandages left!");
       Orion.Wait(1000);
     }
