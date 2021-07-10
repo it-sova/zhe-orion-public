@@ -1,6 +1,3 @@
-// = Orion.Now();
-//var global_GOLD_EARNED; // = 0;
-
 //#include ZHE/helpers.oajs
 //#include ZHE/heal.oajs
 //#include ZHE/test_zone.oajs
@@ -10,83 +7,80 @@
 
 // Types
 const CLEAN_BANDAGES = 0x0e21;
-//// Healing
-// Health % to start healing
-const HEALING_THRESHOLD = 85;
-
+//// Healing ////
+const HEALING_THRESHOLD = 85; // Health % to start healing
 const HEALING_TIMER_X = 1175;
 const HEALING_TIMER_Y = 550;
+//// Healing ////
 
-const DURABILITY_THRESHOLD = 5;
+const DURABILITY_THRESHOLD = 5; // Durability % below which to notify
 
-const NOTIFY_SOUND = "reminder.wav"
-const ALERT_SOUND = "OA/alert.wav"
+const NOTIFY_SOUND = "reminder.wav" // path to notification sound
+const ALERT_SOUND = "OA/alert.wav" // path to notification sound
 const GOLD_FILE_PATH = Player.Name() + "_gold.log";
 const LOOT_TIMESTAMP_FILE_PATH = Player.Name() + "_loot_timestamp.log";
+const LOOT_FINDLIST = 'loot_list';
+
 
 function Autostart() {
-	Orion.SetLOSOptions("pollosthroughtwindows"); //|polusenoshoot");
-	scripts_to_run = [
-		'autoheal',
-		'auto_hungry',
-		'watch_durability',
-		'auto_guards',
-		'lag_watch',
-		'watch_death'
-	]
-	for (_sc = 0; _sc < scripts_to_run.length; _sc++) {
-		Orion.Exec(scripts_to_run[_sc], true);
-	}
-
+    Orion.SetLOSOptions("pollosthroughtwindows"); //|polusenoshoot");
+    scripts_to_run = [
+        'autoheal',
+        'auto_hungry',
+        'watch_durability',
+        'auto_guards',
+        'lag_watch',
+        'watch_death',
+        'watch_exp',
+        'watch_dps'
+    ]
+    for (_sc = 0; _sc < scripts_to_run.length; _sc++) {
+        Orion.Exec(scripts_to_run[_sc], true);
+    }
 }
 
 function loot_toggle() {
-
-	if (Orion.ScriptRunning('loot_new_age')) {
-		var _earned = load_from_file(GOLD_FILE_PATH);
-		var _loot_started = load_from_file(LOOT_TIMESTAMP_FILE_PATH);
-		_time_spent = (Orion.Now() - _loot_started) / 1000;
-		_message = 'Earned ' + _earned + 'gp in ' + parseFloat(_time_spent / 60).toFixed(2) + ' mins.\nRate is ' + parseFloat(_earned / _time_spent / 60).toFixed(2) + ' gp/min';
-		Orion.Print(":gold: "+_message)
-		if (_time_spent > 60) discord_post(_message)
-		Orion.Terminate('loot_new_age');
-		Orion.CharPrint(Player.Serial(), 0x031, 'Loot : OFF');
-	} else {
-		var _loot_started = Orion.Now();
-		save_to_file(LOOT_TIMESTAMP_FILE_PATH, _loot_started);
-		_gold_file = Orion.NewFile(GOLD_FILE_PATH)
-		_gold_file.Remove(GOLD_FILE_PATH);
-		save_to_file(GOLD_FILE_PATH, 0);
-		Orion.Exec('loot_new_age');
-		Orion.CharPrint(Player.Serial(), 0x031, 'Loot : ON');
-	}
+    if (Orion.ScriptRunning('loot_new_age')) {
+        var _earned = load_from_file(GOLD_FILE_PATH);
+        var _loot_started = load_from_file(LOOT_TIMESTAMP_FILE_PATH);
+        _time_spent = (Orion.Now() - _loot_started) / 1000;
+        _message = 'Earned ' + _earned + 'gp in ' + parseFloat(_time_spent / 60).toFixed(2) + ' mins.\nRate is ' + parseFloat(_earned / _time_spent / 60).toFixed(2) + ' gp/min';
+        Orion.Print(":gold: "+_message)
+        // if (_time_spent > 60) discord_post(_message)
+        Orion.Terminate('loot_new_age');
+        Orion.CharPrint(Player.Serial(), 0x031, 'Loot : OFF');
+    } else {
+        var _loot_started = Orion.Now();
+        save_to_file(LOOT_TIMESTAMP_FILE_PATH, _loot_started);
+        rewrite_file(GOLD_FILE_PATH, 0);
+        Orion.Exec('loot_new_age');
+        Orion.CharPrint(Player.Serial(), 0x031, 'Loot : ON');
+    }
 }
-
-
 
 //// Attack
 function attack_nts() {
-	_target = Orion.TargetSystemSerial();
-	if (_target) {
-		_enemy = Orion.FindObject(_target);
-		if (_enemy) {
-			Orion.CharPrint(_enemy.Serial(), 53, "> Target <");
-			if (!Player.WarMode()) Orion.WarMode(true);
-			Orion.Attack(_target);
-		}
-	}
+    _target = Orion.TargetSystemSerial();
+    if (_target) {
+        _enemy = Orion.FindObject(_target);
+        if (_enemy) {
+            Orion.CharPrint(_enemy.Serial(), 53, "> Target <");
+            if (!Player.WarMode()) Orion.WarMode(true);
+            Orion.Attack(_target);
+        }
+    }
 }
 
 function unwar() {
-	var shield = 0x1b76;
-	while (!Player.Dead()) {
-		if (!Orion.ObjAtLayer("LeftHand")) {
-			if (Orion.FindType(shield)) {
-				Orion.EquipT(shield);
-				Orion.Wait(500);
-			}
-		}
-		if (Player.WarMode() == true) Orion.WarMode(false);
-		Orion.Wait(100);
-	}
+    var shield = 0x1b76;
+    while (!Player.Dead()) {
+        if (!Orion.ObjAtLayer("LeftHand")) {
+            if (Orion.FindType(shield)) {
+                Orion.EquipT(shield);
+                Orion.Wait(500);
+            }
+        }
+        if (Player.WarMode() == true) Orion.WarMode(false);
+        Orion.Wait(100);
+    }
 }

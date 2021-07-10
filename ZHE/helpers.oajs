@@ -1,8 +1,7 @@
 function hungry(level) {
     var level = typeof level !== "undefined" ? level : 90;
     var _food_count = 0;
-
-    var food_types = "0x097b|0x09B7";
+    const food_types = "0x097b|0x09B7";
     _food_count = count_multi_types(food_types);
     if (_food_count < 20) {
         self_print("[" + _food_count + "] food left!");
@@ -47,11 +46,10 @@ function durability_check(floor) {
 }
 
 function safe_move(item, to) {
-
     _item_obj = Orion.FindObject(item);
     if (!_item_obj) {
-       Orion.Print('ERROR null item in safe_move()');
-       return false;
+        Orion.Print('ERROR null item in safe_move()');
+        return false;
     }
     _current_item_container = _item_obj.Container();
     _try = 0;
@@ -67,7 +65,6 @@ function safe_move(item, to) {
         if (_try > 3)
             return;
         Orion.DropDraggedItem();
-
         Orion.Wait(50);
         Orion.MoveItem(item, 0, to);
         Orion.Wait(750);
@@ -77,19 +74,15 @@ function safe_move(item, to) {
 function good_item(item) {
     gold_type = 0x0EED;
     if (!item) {
-       Orion.Print('ERROR null item in good_item()');
-       return false;
+        Orion.Print('ERROR null item in good_item()');
+        return false;
     }
     if (item.Graphic() == gold_type) {
         var _earned = load_from_file(GOLD_FILE_PATH);
         _earned += item.Count();
         save_to_file(GOLD_FILE_PATH, _earned);
+        return true;
     }
-    return true;
+    //if item
+    return false;
 }
-//function stat_exp() {
-//  if (InJournal('опыта') ) {
-//   
-//   }
-//}
-
