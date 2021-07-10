@@ -1,175 +1,231 @@
 function loot_new_age() {
-
-	var contents;
-	var corpse;
-	Orion.IgnoreReset();
-	while (true) {
-		while (Player.Dead()) Orion.Wait(100);
-		corpse = Orion.FindTypeEx("0x2006|0x0ECC", "any", "ground", "ignoreself|item", 3);
-		for (var c = 0; c < corpse.length; c++) {
-			if (Player.Dead()) break;
-			if (true) {
-				Orion.OpenContainer(corpse[c].Serial())
-				Orion.Wait(50);
-				var _get_content_try = 0
-				contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
-				while (!contents.length) {
-					_get_content_try++;
-					Orion.Wait(50);
-					contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
-					if (_get_content_try > 3) {
-						Orion.Print('No content.')
-						Orion.Ignore(corpse[c].Serial());
-						break
-					}
-				}
-				if (!contents.length) continue;
-				for (var _i = 0; _i < contents.length; _i++) {
-					if (good_item(contents[_i])) {
-						// Orion.CharPrint(corpse[c].Serial(), 70, 'Loot me!');
-						safe_move(contents[_i].Serial(), 'loot_bag');
-						if (!Orion.InLOS(corpse[c].Serial())) {
-							Orion.CharPrint(corpse[c].Serial(), 70, 'Not in LOS!');
-							Orion.Ignore(corpse[c].Serial());
-							break
-						}
-					}
-				}
-				Orion.Wait(10);
-				Orion.Ignore(corpse[c].Serial());
-				 //Orion.Print('Earned: ' + global_GOLD_EARNED);
-			} else {
-				Orion.Print('failed to open');
-				Orion.Wait(10);
-			}
-		}
-		Orion.Wait(100);
-	}
+    var contents;
+    var corpse;
+    Orion.IgnoreReset();
+    while (true) {
+        while (Player.Dead()) Orion.Wait(100);
+        corpse = Orion.FindTypeEx("0x2006|0x0ECC", "any", "ground", "ignoreself|item", 3);
+        for (var c = 0; c < corpse.length; c++) {
+            if (Player.Dead()) break;
+            if (true) {
+                Orion.OpenContainer(corpse[c].Serial())
+                Orion.Wait(50);
+                var _get_content_try = 0
+                contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
+                while (!contents.length) {
+                    _get_content_try++;
+                    Orion.Wait(100);
+                    contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
+                    if (_get_content_try > 3) {
+                        Orion.Print('Corpse: no content.')
+                        Orion.Ignore(corpse[c].Serial());
+                        break
+                    }
+                }
+                if (!contents.length) continue;
+                // GameObjectList Orion.FindListEx('listName', 'container', 'flags', 'distance', 'notoriety', recurse);
+                contets_from_loot_list = Orion.FindListEx(LOOT_FINDLIST, corpse[c].Serial(), 'item', 'finddistance', '', true);
+                if (contets_from_loot_list.length) {
+                    for (var _i = 0; _i < contets_from_loot_list.length; _i++) {
+                        Orion.Print('item from loot_list' + contets_from_loot_list[_i].Name())
+                        safe_move(contets_from_loot_list[_i].Serial(), 'loot_bag');
+                        if (!Orion.InLOS(corpse[c].Serial())) {
+                            Orion.CharPrint(corpse[c].Serial(), 70, 'Not in LOS!');
+                            Orion.Ignore(corpse[c].Serial());
+                            break;
+                        }
+                    }
+                }
+                contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
+                if (!contents.length) continue;
+                for (var _i = 0; _i < contents.length; _i++) {
+                    if (good_item(contents[_i])) {
+                        // Orion.CharPrint(corpse[c].Serial(), 70, 'Loot me!');
+                        safe_move(contents[_i].Serial(), 'loot_bag');
+                        if (!Orion.InLOS(corpse[c].Serial())) {
+                            Orion.CharPrint(corpse[c].Serial(), 70, 'Not in LOS!');
+                            Orion.Ignore(corpse[c].Serial());
+                            break;
+                        }
+                    }
+                }
+                Orion.Wait(10);
+                Orion.Ignore(corpse[c].Serial());
+            } else {
+                Orion.Print('failed to open');
+                Orion.Wait(10);
+            }
+        }
+        Orion.Wait(100);
+    }
 }
 
-
 function watch_durability() {
-	Orion.Print('Durability warning at: ' + DURABILITY_THRESHOLD + '%');
-	while (true) {
-		durability_check(DURABILITY_THRESHOLD);
-		Orion.Wait(10000);
-	}
+    Orion.Print('Durability warning at: ' + DURABILITY_THRESHOLD + '%');
+    while (true) {
+        durability_check(DURABILITY_THRESHOLD);
+        Orion.Wait(10000);
+    }
 }
 
 function watch_death() {
-	while (!Player.Dead()) {
-		Orion.Wait(5000)
-	}
-	discord_post(' :cry: Dead at X: ' + Player.X() + ' Y: ' + Player.Y());
-	while (Player.Dead()) {
-		Orion.Wait(5000)
-	}
+    while (!Player.Dead()) {
+        Orion.Wait(5000)
+    }
+    discord_post(' :cry: Dead at X: ' + Player.X() + ' Y: ' + Player.Y());
+    while (Player.Dead()) {
+        Orion.Wait(5000)
+    }
 }
 
 function auto_guards() {
-	while (true) {
-		if (Orion.InJournal('is attacking you!*', '', 0, 'any', Orion.Now() - 2000)) {
-			Orion.Say('.guards');
-		}
-		Orion.Wait(1000);
-	}
+    while (true) {
+        if (Orion.InJournal('is attacking you!*', '', 0, 'any', Orion.Now() - 2000)) {
+            Orion.Say('.guards');
+        }
+        Orion.Wait(1000);
+    }
 }
 
 function auto_hungry() {
-	while (true) {
-		hungry(90);
-		Orion.Wait(5 * 10 * 1000);
-	}
+    while (true) {
+        hungry(90);
+        Orion.Wait(5 * 10 * 1000);
+    }
 }
 
 function lag_watch() {
-	latency_gump_creator();
-	while (true) {
-		lag_check();
-		Orion.Wait(10000);
-	}
-
+    latency_gump_creator();
+    while (true) {
+        lag_check();
+        Orion.Wait(10000);
+    }
 }
 
 function lag_check(unused) {
-	const lat_max = 1000;
-	const lat_min = 100;
-	const width_max = 180;
-	const width_min = 10;
-	const green = '#66ff66';
-	const yellow = '#ffff00';
-	const red = '#ff0000';
-	const green_text = 70;
-	const yellow_text = 50;
-	const red_text = 30;
-
-	var request_timestamp = Orion.Now();
-	Orion.Say('.online');
-	var reply = Orion.WaitJournal('Sys. Load', request_timestamp, request_timestamp + 5000);
-	var latency
-	if (!reply) {
-		latency = 5000;
-	} else {
-		latency = reply.Timer() - request_timestamp;
-	}
-	// Orion.Print('latency = '+latency);
-	var color = green;
-	var text_color = green_text;
-
-	if (latency > 0.3 * lat_max) {
-		color = yellow;
-		text_color = yellow_text;
-	}
-	if (latency > 0.5 * lat_max) {
-		color = red;
-		text_color = red_text;
-	}
-	if (latency > lat_max) {
-		width = width_max;
-	} else {
-		width = latency / lat_max * width_max;
-	}
-	var lat_text = latency + 'ms';
-
-	const regex = /(\d\d?%)/g;
-	if (reply) {
-		var _matches = reply.Text().match(regex);
-		var load = _matches[0];
-	}
-
-	sysload_text = 'Load: ' + load;
-	var gump = Orion.CreateCustomGump(1488);
-	gump.AddColoredPolygone(10, 10, width, 10, color, 0, 5, 1, 55);
-
-	gump.AddTextEntry(56, 10, 25, text_color, lat_text, 50, 50, 10);
-	// customGump.AddTextEntry(serial, x, y, 'color', 'text', width, height, maxLength);
-	gump.AddTextEntry(57, 55, 25, text_color, sysload_text, 100, 50, 10);
-	gump.Update();
-
+    const lat_max = 1000;
+    const lat_min = 100;
+    const width_max = 180;
+    const width_min = 10;
+    const green = '#66ff66';
+    const yellow = '#ffff00';
+    const red = '#ff0000';
+    const green_text = 70;
+    const yellow_text = 50;
+    const red_text = 30;
+    var request_timestamp = Orion.Now();
+    Orion.Say('.online');
+    var reply = Orion.WaitJournal('Sys. Load', request_timestamp, request_timestamp + 5000);
+    var latency
+    if (!reply) {
+        latency = 5000;
+    } else {
+        latency = reply.Timer() - request_timestamp;
+    }
+    var color = green;
+    var text_color = green_text;
+    if (latency > 0.3 * lat_max) {
+        color = yellow;
+        text_color = yellow_text;
+    }
+    if (latency > 0.5 * lat_max) {
+        color = red;
+        text_color = red_text;
+    }
+    if (latency > lat_max) {
+        width = width_max;
+    } else {
+        width = latency / lat_max * width_max;
+    }
+    var lat_text = latency + 'ms';
+    const regex = /(\d\d?%)/g;
+    if (reply) {
+        var _matches = reply.Text().match(regex);
+        if (!_matches) load = -1;
+        var load = _matches[0];
+    }
+    sysload_text = 'Load: ' + load;
+    var gump = Orion.CreateCustomGump(1488);
+    gump.AddColoredPolygone(10, 10, width, 10, color, 0, 5, 1, 55);
+    gump.AddTextEntry(56, 10, 25, text_color, lat_text, 50, 50, 10);
+    gump.AddTextEntry(57, 55, 25, text_color, sysload_text, 100, 50, 10);
+    gump.Update();
 }
 
 function latency_gump_callback(unused) {
-	var code = CustomGumpResponse.ReturnCode();
-	if (code == 0) {
-		var gump = Orion.CreateCustomGump(1488);
-		gump.Close();
-	}
+    var code = CustomGumpResponse.ReturnCode();
+    if (code == 0) {
+        var gump = Orion.CreateCustomGump(1488);
+        gump.Close();
+    }
 }
 
 function latency_gump_creator() {
-	// Orion.Print('Hello from latency_gump_creator');
-	var gump = Orion.CreateCustomGump(1488); // Create new custom gump with serial 1488
-	gump.SetNoClose(true); 	// This gump will be no closable by a right mouse click
-	gump.Clear(); // Clear gump cpntents (for rebuilds)
-	gump.SetCallback('latency_gump_callback'); // Set callback function
+    var gump = Orion.CreateCustomGump(1488); // Create new custom gump with serial 1488
+    gump.SetNoClose(true); 	// This gump will be no closable by a right mouse click
+    gump.Clear(); // Clear gump cpntents (for rebuilds)
+    gump.SetCallback('latency_gump_callback'); // Set callback function
+    gump.AddResizepic(0, 0, '13BE', 200, 50);  // Main background
+    gump.AddButton(0, 170, 23, '0x00FC', '0x00FD', '0x00FD', '0')
+    poly_color = 400
+    poly_width = 180
+    gump.AddColoredPolygone(10, 10, poly_width, 10, poly_color, 0, 5, 1, 55);
+    gump.Update();
+}
 
-	gump.AddResizepic(0, 0, '13BE', 200, 50);  // Main background
-	gump.AddButton(0, 170, 23, '0x00FC', '0x00FD', '0x00FD', '0')
-	poly_color = 400
-	poly_width = 180
-	// customGump.AddColoredPolygone(x, y, width, height, 'color', scopeOnly, lineWidth, smooth, serial);
-	gump.AddColoredPolygone(10, 10, poly_width, 10, poly_color, 0, 5, 1, 55);
-	// gump.AddButton(102, 145, 35, '0x00FC', '0x00FD', '0x00FD', '0')
-	gump.Update();
+// const DPS_FILE_PATH = Player.Name() + "_dps.log";
+function watch_dps() {
+    const _regex = /(\d\d?\d?)/g;
+    var _total_dmg = 0;
+    var _time_window = Orion.Now();
+    Orion.Print('hi');
+    // Orion.WaitJournal('pattern', startTime, endTime, 'flags', 'serial', 'color');
+    // flag mobile color = 0x0487
+    while (true) {
+        if (Orion.Now() - _time_window > 30 * 1000) {
+            Orion.Print('reset dps')
+            _time_window = Orion.Now();
+            _total_dmg = 0;
+        }
+        Orion.Wait(10);
+        if (_msg = Orion.WaitJournal('', Orion.Now() - 5, Orion.Now() + 10000, 'mobile', '', '0x0487')) {
+            var _matches = _msg.Text().match(_regex);
+            if (!_matches) continue;
+            var _dmg = parseInt(_matches[0]);
+            if (isNaN(_dmg)) {
+                Orion.Print('[ERROR] _dmg is NaN, strange, found string = ' + _matches[0]);
+                continue;
+            }
+            _total_dmg += _dmg;
+            _dps = parseFloat(_total_dmg / ((Orion.Now() - _time_window) / 1000)).toFixed(2)
+            Orion.Print('total = ' + _total_dmg + ' dps = ' + _dps);
+        }
+    }
+}
 
+const EXP_FILE_PATH = Player.Name() + "_exp_gained.log";
+function watch_exp() {
+    const _regex = /(\d\d?\d?)/g;
+    while (true) {
+        Orion.Wait(10);
+        if (_exp_msg = Orion.WaitJournal("experience", Orion.Now(), Orion.Now() + 10000, '', '0', 'any')) {
+            if (_exp_msg.Text().indexOf('have gained') !== -1) {
+                var _matches = _exp_msg.Text().match(_regex);
+                if (!_matches) continue;
+                var _exp_gained = parseInt(_matches[0]);
+                if (isNaN(_exp_gained)) {
+                    Orion.Print('[ERROR] _exp_gained is NaN, strange, found string = ' + _matches[0]);
+                    continue;
+                }
+                var _current_exp = load_from_file(EXP_FILE_PATH);
+                if (isNaN(_exp_gained)) {
+                    Orion.Print('[ERROR] _current_exp is NaN, strange, _current_exp = ' + _current_exp);
+                    continue;
+                }
+                _current_exp += _exp_gained;
+                Orion.Print('Total exp gained: ' + _current_exp);
+                save_to_file(EXP_FILE_PATH, _current_exp);
+            }
+        }
+    }
 }

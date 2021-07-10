@@ -1,3 +1,34 @@
+function test_list_loot() {
+    // Orion.WaitForAddObject('test_item');
+    // test_item = Orion.FindObject('test_item')
+    loot_list = Orion.GetFindList(LOOT_FINDLIST);
+    if (loot_list) {
+        loot_list_items = loot_list.Items();
+        for (i = 0; i < loot_list_items.length; i++) {
+            Orion.Print(loot_list_items[i].Graphic())
+        }
+    } else {
+        Orion.Print('ERROR: no such findlist {' + LOOT_FINDLIST + '}');
+    }
+
+}
+
+function test_list_lookup() {
+    Orion.WaitForAddObject('test_item');
+    test_item = Orion.FindObject('test_item')
+    loot_list = Orion.GetFindList(LOOT_FINDLIST);
+    loot_list_items = loot_list.Items();
+    if (value_in_array(test_item.Graphic(), loot_list_items.Graphic())) {
+        Orion.Print('take it!')
+    } else {
+        Orion.Print('thats sh1t')
+    }
+
+}
+
+
+
+
 //function ttimer() {
 //  const TIMER_X = 1175
 //  const TIMER_Y = 550
@@ -10,47 +41,67 @@
 //	Orion.Print(Orion.InLOS(item));
 //}
 
-function test_round() {
+// function test_hits() {
+//    _target = Orion.ClientLastAttack();
+//    if (Orion.ObjectExists(_target)) {
+//       _target_obj = Orion.FindObject(_target);
+//       Orion.Print(_target_obj.Hits()+'/'+_target_obj.MaxHits());
+//    }
+// }
 
-   a = 1122334455
-   b = a / 100000
-   Orion.Print(b);
-   c = parseFloat(b).toFixed(2);
-   Orion.Print(c);
+// function test_sub_in_string() {
+//    sub = 'aba'
+//    str = 'kabab'
+//    res = str.indexOf(sub)
+//    Orion.Print(res);
+// }
 
-}
+// function test_typof() {
+//    Orion.Print(typeof 123);
+// }
 
-function test_timer(msec) {
-   Orion.AddDisplayTimer("healing", msec, "custom", "LineBar", "Healing...", TIMER_X, TIMER_Y);
-   Orion.DisplayTimerSetIcon("healing", "Left", "0x0E21");
-   Orion.DisplayTimerSetSize("healing", 100, 30);
-}
+// function test_rewrite() {
+//    rewrite_file(EXP_FILE_PATH, 0)
+// }
 
-function test_notify() {
-   notify('aaa', 3)
-}
+// function test_round() {
+//    a = 1122334455
+//    b = a / 100000
+//    Orion.Print(b);
+//    c = parseFloat(b).toFixed(2);
+//    Orion.Print(c);
+// }
 
-function test_discord() {
-   if (Orion.Connected()) {
-      discord_post("Some polish.");
-   } else {
-      discord_post("Some polish.");
-   }
-}
+// function test_timer(msec) {
+//    Orion.AddDisplayTimer("healing", msec, "custom", "LineBar", "Healing...", TIMER_X, TIMER_Y);
+//    Orion.DisplayTimerSetIcon("healing", "Left", "0x0E21");
+//    Orion.DisplayTimerSetSize("healing", 100, 30);
+// }
 
-function test_name_profile() {
-   Orion.Print('my name is ' + Player.Name());
-   Orion.Print('my profile is ' + Player.Profile());
-}
+// function test_notify() {
+//    notify('aaa', 3)
+// }
 
+// function test_discord() {
+//    if (Orion.Connected()) {
+//       discord_post("Some polish.");
+//    } else {
+//       discord_post("Some polish.");
+//    }
+// }
+
+// function test_name_profile() {
+//    Orion.Print('my name is ' + Player.Name());
+//    Orion.Print('my profile is ' + Player.Profile());
+// }
 
 // function test_val() {
 // 	Orion.Print(Orion.SkillValue('Tactics'));
 // }
 
-function test_sound() {
-   Orion.PlayWav('/home/gff/games/orion-native/OA/reminder.wav');
-}
+// function test_sound() {
+//    Orion.PlayWav('/home/gff/games/orion-native/OA/reminder.wav');
+// }
 
 // function notify_test() {
 //     repeats = 3

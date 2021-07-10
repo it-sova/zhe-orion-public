@@ -1,48 +1,109 @@
 function autoheal() {
-  // Start
-  _healing_time = 0;
-  Orion.Print("Healing at " + (Player.MaxHits() / 100) * HEALING_THRESHOLD + "HP (" + HEALING_THRESHOLD + "%)");
-  while (1) {
-    _bandages_count = Orion.Count(CLEAN_BANDAGES);
-    if (_bandages_count > 0) {
-      if (Player.Hits() < (Player.MaxHits() / 100) * HEALING_THRESHOLD || Player.Poisoned()) {
-        _poisoned = Player.Poisoned();
-        if (Player.Dead()) {
-          self_print("I'm dead, pausing script");
-          while (Player.Dead()) Orion.Wait(1000);
+    // Start
+    _healing_time = 0;
+    Orion.Print("Healing at " + (Player.MaxHits() / 100) * HEALING_THRESHOLD + "HP (" + HEALING_THRESHOLD + "%)");
+    while (1) {
+        _bandages_count = Orion.Count(CLEAN_BANDAGES);
+        if (_bandages_count > 0) {
+            if (Player.Hits() < (Player.MaxHits() / 100) * HEALING_THRESHOLD || Player.Poisoned()) {
+                _poisoned = Player.Poisoned();
+                if (Player.Dead()) {
+                    self_print("I'm dead, pausing script");
+                    while (Player.Dead()) Orion.Wait(1000);
+                }
+                if (Player.Poisoned() && Orion.SkillValue("Healing") < 800) {
+                    self_print("I'm poisoned and can't cure poison at current skill level");
+                    while (Player.Poisoned()) Orion.Wait(1000);
+                }
+                _healing_started = Orion.Now();
+                Orion.Say(".bandageself");
+                if (_healing_time > 0 && !_poisoned) add_healing_timer(_healing_time);
+                Orion.WaitJournal("Bloody Bandages|cure|poison", Orion.Now(), Orion.Now() + 10 * 1000);
+                if (_bandages_count < 50) self_print(' [' + _bandages_count + "] bandages left!");
+                _healing_finished = Orion.Now();
+                if (!_poisoned) _healing_time = _healing_finished - _healing_started;
+                // Orion.Print("_poisoned == " + _poisoned + " _healing_time == " + _healing_time);
+                if (Orion.DisplayTimerExists("healing")) Orion.RemoveDisplayTimer("healing");
+                Orion.Wait(200);
+            }
+        } else {
+            if (Player.Dead()) {
+                self_print("I'm dead, pausing script");
+                while (Player.Dead()) Orion.Wait(1000);
+            }
+            self_print("!!! No more bandages left!");
+            Orion.Wait(1000);
         }
-        if (Player.Poisoned() && Orion.SkillValue("Healing") < 800) {
-          self_print("I'm poisoned and can't cure poison at current skill level");
-          while (Player.Poisoned()) Orion.Wait(1000);
-        }
-        _healing_started = Orion.Now();
-        Orion.Say(".bandageself");
-        if (_healing_time > 0 && !_poisoned) add_healing_timer(_healing_time);
-        Orion.WaitJournal("Bloody Bandages|cure|poison", Orion.Now(), Orion.Now() + 10 * 1000);
-        if (_bandages_count < 50) self_print(' [' + _bandages_count - 1 + "] bandages left!");
-        _healing_finished = Orion.Now();
-        if (!_poisoned) _healing_time = _healing_finished - _healing_started;
-        // Orion.Print("_poisoned == " + _poisoned + " _healing_time == " + _healing_time);
-        if (Orion.DisplayTimerExists("healing")) Orion.RemoveDisplayTimer("healing");
-        Orion.Wait(200);
-      }
-    } else {
-      if (Player.Dead()) {
-        self_print("I'm dead, pausing script");
-        while (Player.Dead()) Orion.Wait(1000);
-      }
-      self_print("!!! No more bandages left!");
-      Orion.Wait(1000);
+        //if (_bandages_count < 350) {
+        //    Orion.CharPrint(Player.Serial(), '33', ' [' + Orion.Count('0x0E21') + '] bandage left ! ');
+        //}
+        Orion.Wait(100);
     }
-    //if (_bandages_count < 350) {
-    //    Orion.CharPrint(Player.Serial(), '33', ' [' + Orion.Count('0x0E21') + '] bandage left ! ');
-    //}
-    Orion.Wait(100);
-  }
+}
+
+function set_and_heal_target() {
+    Orion.WaitForAddObject('heal_target');
+    Orion.CharPrint('heal_target', 0xFFFF, 'heal_target!');
+    heal_target = Orion.FindObject('heal_target')
+    auto_heal_target(heal_target);
+}
+
+function auto_heal_target(target) {
+    // Start
+    _healing_time = 0;
+    var _skill_time = 0;
+    Orion.Print("Healing at " + HEALING_THRESHOLD * 10 + "HP (" + HEALING_THRESHOLD + "%)");
+    while (1) {
+        _bandages_count = Orion.Count(CLEAN_BANDAGES);
+        if (_bandages_count > 0) {
+            if (target.Hits() < HEALING_THRESHOLD * 10 || target.Poisoned()) {
+                Orion.Print('need to heal, cuz hp = ' + target.Hits());
+                _poisoned = target.Poisoned();
+                if (target.Dead()) {
+                    self_print(target.Name() + " is dead, pausing script");
+                    while (target.Dead()) Orion.Wait(1000);
+                }
+                if (target.Poisoned() && Orion.SkillValue("Healing") < 800) {
+                    self_print("I'm poisoned and can't cure poison at current skill level");
+                    while (target.Poisoned()) Orion.Wait(1000);
+                }
+                _healing_started = Orion.Now();
+                //Orion.Say(".bandageself");
+                Orion.UseType(CLEAN_BANDAGES);
+                while (!Orion.HaveTarget() && _skill_time < 1500) {
+                    Orion.Wait(50);
+                    _skill_time += 50;
+                }
+                if (Orion.HaveTarget()) {
+                    Orion.TargetObject(target.Serial());
+                }
+                if (_healing_time > 0 && !_poisoned) add_healing_timer(_healing_time);
+                Orion.WaitJournal("Bloody Bandages|cure|poison", Orion.Now(), Orion.Now() + 10 * 1000);
+                if (_bandages_count < 50) self_print(' [' + _bandages_count + "] bandages left!");
+                _healing_finished = Orion.Now();
+                if (!_poisoned) _healing_time = _healing_finished - _healing_started;
+                // Orion.Print("_poisoned == " + _poisoned + " _healing_time == " + _healing_time);
+                if (Orion.DisplayTimerExists("healing")) Orion.RemoveDisplayTimer("healing");
+                Orion.Wait(200);
+            }
+        } else {
+            Orion.Print('DONT need to heal, cuz hp = ' + target.Hits());
+            if (target.Dead()) {
+                self_print("I'm dead, pausing script");
+                while (target.Dead()) Orion.Wait(1000);
+            }
+            self_print("!!! No more bandages left!");
+            Orion.Wait(1000);
+        }
+        //if (_bandages_count < 350) {
+        //    Orion.CharPrint(Player.Serial(), '33', ' [' + Orion.Count('0x0E21') + '] bandage left ! ');
+        //}
+        Orion.Wait(100);
+    }
 }
 
 function add_healing_timer(msec) {
-  Orion.AddDisplayTimer("healing", msec, "custom", "LineBar", "Healing...", HEALING_TIMER_X, HEALING_TIMER_Y);
-  Orion.DisplayTimerSetIcon("healing", "Left", "0x0E21");
-  Orion.DisplayTimerSetSize("healing", 100, 30);
+    Orion.AddDisplayTimer("healing", msec, "custom", "LineBar", "Healing...", HEALING_TIMER_X, HEALING_TIMER_Y);
+    Orion.DisplayTimerSetIcon("healing", "Left", "0x0E21");
+    Orion.DisplayTimerSetSize("healing", 100, 30);
 }
