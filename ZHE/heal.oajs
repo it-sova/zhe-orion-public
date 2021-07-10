@@ -74,8 +74,9 @@ function auto_heal_target(target) {
                     Orion.Wait(50);
                     _skill_time += 50;
                 }
-                if (Orion.HaveTarget()) {
+                while (Orion.HaveTarget()) {
                     Orion.TargetObject(target.Serial());
+                    Orion.Wait(100);
                 }
                 if (_healing_time > 0 && !_poisoned) add_healing_timer(_healing_time);
                 Orion.WaitJournal("Bloody Bandages|cure|poison", Orion.Now(), Orion.Now() + 10 * 1000);

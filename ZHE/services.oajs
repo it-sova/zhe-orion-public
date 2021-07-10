@@ -90,7 +90,7 @@ function auto_guards() {
 function auto_hungry() {
     while (true) {
         hungry(90);
-        Orion.Wait(5 * 10 * 1000);
+        Orion.Wait(2 * 10 * 1000);
     }
 }
 
