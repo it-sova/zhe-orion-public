@@ -203,7 +203,6 @@ function watch_dps() {
     }
 }
 
-const EXP_FILE_PATH = Player.Name() + "_exp_gained.log";
 function watch_exp() {
     const _regex = /(\d\d?\d?)/g;
     while (true) {
