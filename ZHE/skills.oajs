@@ -220,18 +220,23 @@ function magery_poison() {
 
 function dont_kill_enemy() {
     while (true) {
-        Orion.Wait(50);
+        Orion.Wait(500);
         _target = Orion.ClientLastAttack();
         if (Orion.ObjectExists(_target)) {
             _target_obj = Orion.FindObject(_target);
             if (_target_obj.Hits() < 300) {
                 Orion.Print('need another target');
+                Orion.Wait(100);
                 Orion.Ignore(_target);
                 Orion.Wait(100);
                 _enemies = Orion.FindTypeEx('any', 'any', 'ground', 'mobile', '2', '3');
+                if (!_enemies.length) {
+                    Orion.Print('no healthy enemies around, len =' + _enemies.length);
+                    Orion.IgnoreReset();
+                    continue;
+                }
                 Orion.Print('Enemies found ' + _enemies.length);
                 if (_enemies[0].Hits() > 300) {
-                    Orion.IgnoreReset();
                     Orion.Attack(_enemies[0].Serial());
                     Orion.Print('New target ' + _enemies[0].Serial())
                     Orion.Wait(100);
@@ -267,15 +272,16 @@ function weapon_changer() {
             Orion.EquipT(hammer_type);
             Orion.Wait(750);
         }
+        if (!Orion.ObjAtLayer('RightHand'))
         if (Orion.ObjAtLayer('RightHand').Graphic() == hammer_type && Player.Stam() < 5) {
             Orion.DropDraggedItem('backpack');
             Orion.Wait(750);
             Orion.Unequip('RightHand');
             Orion.Wait(750);
-            Orion.EquipT(dagger_type);
-            Orion.Wait(750);
+            // Orion.EquipT(dagger_type);
+            // Orion.Wait(750);
         }
-        if (Orion.ObjAtLayer('RightHand').Graphic() == dagger_type && Player.Stam() > 40) {
+        if (!Orion.ObjAtLayer('RightHand').Graphic() == hammer_type && Player.Stam() > 40) {
             Orion.DropDraggedItem('backpack');
             Orion.Wait(750);
             Orion.Unequip('RightHand');

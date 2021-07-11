@@ -1,6 +1,9 @@
 function loot_new_age() {
+    // TODO: if no 'loot_bag' set in objects, use backpack with warning
     var contents;
     var corpse;
+    var _get_content_try;
+    var contents_from_loot_list;
     Orion.IgnoreReset();
     while (true) {
         while (Player.Dead()) Orion.Wait(100);
@@ -9,8 +12,8 @@ function loot_new_age() {
             if (Player.Dead()) break;
             if (true) {
                 Orion.OpenContainer(corpse[c].Serial())
-                Orion.Wait(50);
-                var _get_content_try = 0
+                Orion.Wait(100);
+                _get_content_try = 0;
                 contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
                 while (!contents.length) {
                     _get_content_try++;
@@ -18,24 +21,28 @@ function loot_new_age() {
                     contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
                     if (_get_content_try > 3) {
                         Orion.Print('Corpse: no content.')
+                        Orion.CharPrint(corpse[c].Serial(), 70, 'No content.');
                         Orion.Ignore(corpse[c].Serial());
                         break
                     }
                 }
                 if (!contents.length) continue;
                 // GameObjectList Orion.FindListEx('listName', 'container', 'flags', 'distance', 'notoriety', recurse);
-                contets_from_loot_list = Orion.FindListEx(LOOT_FINDLIST, corpse[c].Serial(), 'item', 'finddistance', '', true);
-                if (contets_from_loot_list.length) {
-                    for (var _i = 0; _i < contets_from_loot_list.length; _i++) {
-                        Orion.Print('item from loot_list' + contets_from_loot_list[_i].Name())
-                        safe_move(contets_from_loot_list[_i].Serial(), 'loot_bag');
+                contents_from_loot_list = Orion.FindListEx(LOOT_FINDLIST, corpse[c].Serial(), 'item', 'finddistance', '', true);
+                if (contents_from_loot_list.length) {
+                    for (var _i = 0; _i < contents_from_loot_list.length; _i++) {
+                        Orion.Print('item from loot_list' + contents_from_loot_list[_i].Name())
+                        safe_move(contents_from_loot_list[_i].Serial(), 'loot_bag');
                         if (!Orion.InLOS(corpse[c].Serial())) {
                             Orion.CharPrint(corpse[c].Serial(), 70, 'Not in LOS!');
                             Orion.Ignore(corpse[c].Serial());
                             break;
                         }
                     }
+                } else {
+                    Orion.Print('No loot from loot list found.')
                 }
+                Orion.Wait(50);
                 contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
                 if (!contents.length) continue;
                 for (var _i = 0; _i < contents.length; _i++) {
