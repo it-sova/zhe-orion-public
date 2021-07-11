@@ -8,7 +8,7 @@
 // Types
 const CLEAN_BANDAGES = 0x0e21;
 //// Healing ////
-const HEALING_THRESHOLD = 85; // Health % to start healing
+const HEALING_THRESHOLD = 95; // Health % to start healing
 const HEALING_TIMER_X = 1175;
 const HEALING_TIMER_Y = 550;
 //// Healing ////
@@ -20,6 +20,7 @@ const ALERT_SOUND = "OA/alert.wav" // path to notification sound
 const GOLD_FILE_PATH = Player.Name() + "_gold.log";
 const LOOT_TIMESTAMP_FILE_PATH = Player.Name() + "_loot_timestamp.log";
 const LOOT_FINDLIST = 'loot_list';
+const EXP_FILE_PATH = Player.Name() + "_exp_gained.log";
 
 
 function Autostart() {
@@ -38,7 +39,9 @@ function Autostart() {
         Orion.Exec(scripts_to_run[_sc], true);
     }
 }
-
+function reset_exp() {
+    rewrite_file(EXP_FILE_PATH, 0);
+}
 function loot_toggle() {
     var _loot_started;
     if (Orion.ScriptRunning('loot_new_age')) {

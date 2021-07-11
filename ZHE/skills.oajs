@@ -34,13 +34,47 @@ function item_id() {
     }
 }
 
-function use_ss() {
+function ss_with_dispel() {
     const fail_msg = 'You fail to communicate with the netherworld.';
     const succ_msg = 'You contact the netherworld';
     const wait_msg = 'You must wait to perform another action';
     const delay_msg = 'You have to wait to contact with the netherworld again';
-    Orion.UseSkill('Spirit Speak');
-    Orion.WaitJournal(fail_msg + '|' + succ_msg + '|' + wait_msg + '|' + delay_msg, Orion.Now(), Orion.Now() + 11000);
+    var _start_time;
+    var _cast_timestamp;
+    while (!Player.Dead()) {
+        _start_time = Orion.Now();
+        Orion.Wait(50);
+        Orion.UseSkill('Spirit Speak');
+        Orion.WaitJournal(fail_msg+'|'+succ_msg+'|'+wait_msg+'|'+delay_msg, Orion.Now(), Orion.Now() + 11000);
+        if (Orion.InJournal(succ_msg+'|'+delay_msg, '', 0, 'any', _start_time, Orion.Now())) {
+            while (!Orion.InJournal('wiped', '', 0, 'any', _start_time, Orion.Now())) {
+                _cast_timestamp = Orion.Now();
+                Orion.Cast('Dispel');
+                Orion.Wait(100);
+                
+                while (!Orion.HaveTarget() && Orion.Now() - _cast_timestamp < 18000 && !Orion.InJournal('fizzle|enough reagents to cast', '', 0, 'any', _cast_timestamp) ) Orion.Wait(500);
+                while (Orion.HaveTarget()) {
+                    Orion.TargetObject(Player.Serial());
+                    Orion.Wait(100);
+                }
+                Orion.WaitJournal('fizzle|wiped|disturbed|concentration|reagents to cast', _cast_timestamp, Orion.Now() + 21000);
+                if ( Orion.InJournal('enough reagents to cast', '', 0, 'any', _cast_timestamp) ) {
+                    Orion.Print('reags out');
+                    Orion.Exec('item_id', true);
+                    return;
+                }
+                Orion.Wait(500);
+                if (Player.Mana()<Player.MaxMana()) { 
+                    Orion.Print('meditate!');
+                    Orion.UseSkill('Meditation');
+                    Orion.Wait(5000);
+                }
+            }
+        } else {
+            Orion.Wait(11000);
+        }
+    }
+    
 }
 
 function use_spirit_speak() {
@@ -233,6 +267,22 @@ function weapon_changer() {
             Orion.EquipT(hammer_type);
             Orion.Wait(750);
         }
+        if (Orion.ObjAtLayer('RightHand').Graphic() == hammer_type && Player.Stam() < 5) {
+            Orion.DropDraggedItem('backpack');
+            Orion.Wait(750);
+            Orion.Unequip('RightHand');
+            Orion.Wait(750);
+            Orion.EquipT(dagger_type);
+            Orion.Wait(750);
+        }
+        if (Orion.ObjAtLayer('RightHand').Graphic() == dagger_type && Player.Stam() > 40) {
+            Orion.DropDraggedItem('backpack');
+            Orion.Wait(750);
+            Orion.Unequip('RightHand');
+            Orion.Wait(750);
+            Orion.EquipT(hammer_type);
+            Orion.Wait(750);
+        }
     }
 }
 
@@ -261,6 +311,7 @@ function anatomy() {
     var targets = [];
 
     while (!Player.Dead()) {
+        if (Player.Hits() < 30) continue;
         targets = Orion.FindType('any', 'any', 'ground', 'mobile|ignoreself', '2', '3');
         targets.forEach(function (_target) {
             if (Orion.ObjectExists(_target)) {
