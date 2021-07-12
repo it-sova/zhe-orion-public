@@ -58,7 +58,7 @@ function loot_toggle() {
         var _earned = load_from_file(GOLD_FILE_PATH);
         _loot_started = load_from_file(LOOT_TIMESTAMP_FILE_PATH);
         _time_spent = (Orion.Now() - _loot_started) / 1000;
-        _message = 'Earned ' + _earned + 'gp in ' + parseFloat(_time_spent / 60).toFixed(2) + ' mins.\nRate is ' + parseFloat(_earned / _time_spent / 60).toFixed(2) + ' gp/min';
+        _message = 'Earned ' + _earned + 'gp in ' + parseFloat(_time_spent / 60).toFixed(2) + ' mins.\nRate is ' + parseFloat(_earned / (_time_spent / 60)).toFixed(2) + ' gp/min';
         Orion.Print(":gold: "+_message)
         // if (_time_spent > 60) discord_post(_message)
         Orion.Terminate('loot_new_age');
