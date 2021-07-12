@@ -42,6 +42,7 @@ function Autostart() {
         'lag_watch',
         'watch_death',
         'watch_exp',
+        'efficiency_gump_creator',
         'watch_dps'
     ]
     for (_sc = 0; _sc < scripts_to_run.length; _sc++) {

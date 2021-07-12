@@ -81,11 +81,14 @@ function good_item(item) {
         _earned += item.Count();
         save_to_file(GOLD_FILE_PATH, _earned);
         _loot_started_timestamp = load_from_file(LOOT_TIMESTAMP_FILE_PATH);
-        _gp_per_min = parseFloat( _earned / (Orion.Now() - _loot_started_timestamp) ).toFixed(2)
+        _gp_per_min = parseFloat( _earned / ( (Orion.Now() - _loot_started_timestamp)/1000/60 ) ).toFixed(2)
         process_progress_bar(1489, _gp_per_min, GP_PER_MIN_MAX, 
             14893, GOLD_POLY_X, GOLD_POLY_Y,
             148931, ' gp/min', 10, 25+GOLD_POLY_Y-DMG_POLY_Y,
             148932, 'total: '+_earned, 95, 25+GOLD_POLY_Y-DMG_POLY_Y)
+        return true;
+    }
+    if (Orion.Contains(item.Name(), 'Power Scroll')) {
         return true;
     }
     //if item
