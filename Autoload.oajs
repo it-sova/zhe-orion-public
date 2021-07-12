@@ -7,21 +7,30 @@
 
 // Types
 const CLEAN_BANDAGES = 0x0e21;
-//// Healing ////
+//// Healing SETTINGS////
 const HEALING_THRESHOLD = 95; // Health % to start healing
 const HEALING_TIMER_X = 1175;
 const HEALING_TIMER_Y = 550;
-//// Healing ////
+//// Healing SETTINGS////
 
+//// MISC SETTINGS ////
 const DURABILITY_THRESHOLD = 5; // Durability % below which to notify
+const LOOT_FINDLIST = 'loot_list'; // Name of findlist to search loot types in
+//// MISC SETTINGS ////
 
-const NOTIFY_SOUND = "reminder.wav" // path to notification sound
-const ALERT_SOUND = "OA/alert.wav" // path to notification sound
+//// EFFICIENCY GUMP SETTINGS ////
+const DPS_MAX = 10;
+const EXP_PER_MIN_MAX = 1000;
+const GP_PER_MIN_MAX = 1000;
+//// EFFICIENCY GUMP SETTINGS ////
+
+//// PATH SETTINGS ////
 const GOLD_FILE_PATH = Player.Name() + "_gold.log";
 const LOOT_TIMESTAMP_FILE_PATH = Player.Name() + "_loot_timestamp.log";
-const LOOT_FINDLIST = 'loot_list';
 const EXP_FILE_PATH = Player.Name() + "_exp_gained.log";
-
+const NOTIFY_SOUND = "reminder.wav" // path to notification sound
+const ALERT_SOUND = "OA/alert.wav" // path to notification sound
+//// PATH SETTINGS ////
 
 function Autostart() {
     Orion.SetLOSOptions("pollosthroughtwindows"); //|polusenoshoot");

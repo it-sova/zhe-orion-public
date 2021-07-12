@@ -190,7 +190,7 @@ function watch_dps() {
     // flag mobile color = 0x0487
     while (true) {
         if (Orion.Now() - _time_window > 30 * 1000) {
-            Orion.Print('reset dps')
+            // Orion.Print('reset dps')
             _time_window = Orion.Now();
             _total_dmg = 0;
         }
@@ -205,13 +205,82 @@ function watch_dps() {
             }
             _total_dmg += _dmg;
             _dps = parseFloat(_total_dmg / ((Orion.Now() - _time_window) / 1000)).toFixed(2)
-            Orion.Print('total = ' + _total_dmg + ' dps = ' + _dps);
+            // Orion.Print('total = ' + _total_dmg + ' dps = ' + _dps);
+            process_progress_bar(1489, _dps, DPS_MAX, 14891, DMG_POLY_X, DMG_POLY_Y, 148911, ' dmg/s', 10, 25, 148912, 'total: '+_total_dmg, 95, 25);
         }
     }
 }
+//(gump_id, val, val_max, polygon_id, text_1_id, text_2_id, text_1_suffix, text2 )
+//10, 10
+function process_progress_bar(gump_id, val, val_max, 
+    polygon_id, polygon_x, polygon_y,
+    text_1_id, text_1_suffix, text_1_x, text_1_y,
+    text_2_id, text_2, text_2_x, text_2_y ){
+    //const val_max = 1000;
+    const width_max = 180;
+    const green = '#66ff66';
+    const yellow = '#ffff00';
+    const red = '#ff0000';
+    const green_text = 70;
+    const yellow_text = 50;
+    const red_text = 30;
+    var color = red ;
+    var text_color = red_text;
+    if ( val > 0.3 * val_max) {
+        color = yellow;
+        text_color = yellow_text;
+    }
+    if ( val > 0.5 * val_max) {
+        color = green;
+        text_color = green_text;
+    }
+    if ( val > val_max) {
+        width = width_max;
+    } else {
+        width = val / val_max * width_max;
+    }
+    var text1 = val + text_1_suffix;
+    var gump = Orion.CreateCustomGump(gump_id);
+    gump.AddColoredPolygone(polygon_x, polygon_y, width, 10, color, 0, 5, 1, polygon_id);
+    gump.AddTextEntry(text_1_id, text_1_x, text_1_y, text_color, text1, 100, 50, 20);
+    gump.AddTextEntry(text_2_id, text_2_x, text_2_y, text_color, text_2, 100, 50, 20);
+    gump.Update();
+}
+
+function efficiency_gump_callback(unused) {
+    var code = CustomGumpResponse.ReturnCode();
+    if (code == 0) {
+        var gump = Orion.CreateCustomGump(1489);
+        gump.Close();
+    }
+}
+
+const DMG_POLY_X = 10;
+const DMG_POLY_Y = 10;
+const EXP_POLY_X = 10;
+const EXP_POLY_Y = 50;
+const GOLD_POLY_X = 10;
+const GOLD_POLY_Y = 90;
+function efficiency_gump_creator() {
+    var gump = Orion.CreateCustomGump(1489); // Create new custom gump with serial 1488
+    gump.SetNoClose(true); 	// This gump will be no closable by a right mouse click
+    gump.Clear(); // Clear gump cpntents (for rebuilds)
+    gump.SetCallback('efficiency_gump_callback'); // Set callback function
+    gump.AddResizepic(0, 0, '13BE', 200, 150);  // Main background
+    gump.AddButton(0, 170, 123, '0x00FC', '0x00FD', '0x00FD', '0')
+    var poly_color = 400;
+    var poly_width = 180;
+    gump.AddColoredPolygone(DMG_POLY_X, DMG_POLY_Y, poly_width, 10, poly_color, 0, 5, 1, 14891);
+    gump.AddColoredPolygone(EXP_POLY_X, EXP_POLY_Y, poly_width, 10, poly_color, 0, 5, 1, 14892);
+    gump.AddColoredPolygone(GOLD_POLY_X, GOLD_POLY_Y, poly_width, 10, poly_color, 0, 5, 1, 14893);
+    gump.Update();
+}
+
 
 function watch_exp() {
+    // add button to reset exp
     const _regex = /(\d\d?\d?)/g;
+    const _watch_begin_time = Orion.Now();
     while (true) {
         Orion.Wait(10);
         if (_exp_msg = Orion.WaitJournal("experience", Orion.Now(), Orion.Now() + 10000, '', '0', 'any')) {
@@ -229,7 +298,9 @@ function watch_exp() {
                     continue;
                 }
                 _current_exp += _exp_gained;
-                Orion.Print('Total exp gained: ' + _current_exp);
+                // Orion.Print('Total exp gained: ' + _current_exp);
+                _exp_per_min = parseFloat(_current_exp / (Orion.Now() - _watch_begin_time / 1000 / 60)).toFixed(2);
+                process_progress_bar(1489, _exp_per_min, EXP_PER_MIN_MAX, 14892, EXP_POLY_X, EXP_POLY_Y, 148921, ' exp/min', 10, 25+EXP_POLY_Y-DMG_POLY_X, 148922, 'total: '+_current_exp, 95, 25+EXP_POLY_Y-DMG_POLY_X);
                 save_to_file(EXP_FILE_PATH, _current_exp);
             }
         }
