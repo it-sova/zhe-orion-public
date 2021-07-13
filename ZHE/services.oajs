@@ -76,12 +76,14 @@ function watch_durability() {
 }
 
 function watch_death() {
-    while (!Player.Dead()) {
-        Orion.Wait(5000)
-    }
-    discord_post(' :cry: Dead at X: ' + Player.X() + ' Y: ' + Player.Y());
-    while (Player.Dead()) {
-        Orion.Wait(5000)
+    while (true) {
+        while (!Player.Dead()) {
+            Orion.Wait(5000)
+        }
+        discord_post(' :cry: Dead at X: ' + Player.X() + ' Y: ' + Player.Y());
+        while (Player.Dead()) {
+            Orion.Wait(5000)
+        }
     }
 }
 
@@ -148,7 +150,7 @@ function lag_check(unused) {
     const regex = /(\d\d?%)/g;
     if (reply) {
         var _matches = reply.Text().match(regex);
-        if (!_matches) load = -1;
+        if (!_matches.length) load = -1;
         var load = _matches[0];
     }
     sysload_text = 'Load: ' + load;
@@ -172,8 +174,9 @@ function latency_gump_creator() {
     gump.SetNoClose(true); 	// This gump will be no closable by a right mouse click
     gump.Clear(); // Clear gump cpntents (for rebuilds)
     gump.SetCallback('latency_gump_callback'); // Set callback function
-    gump.AddResizepic(0, 0, '13BE', 200, 50);  // Main background
-    gump.AddButton(0, 170, 23, '0x00FC', '0x00FD', '0x00FD', '0')
+    gump.AddResizepic(0, 0, '13BE', 200, 50);  // Main background 13BE
+    // gump.AddGumpPic(100, 0, 0x941, 0);
+    gump.AddButton(0, 170, 27, '0x5686', '0x5687', '0x5688', '0') // 0x5686 0x9a8
     poly_color = 400
     poly_width = 180
     gump.AddColoredPolygone(10, 10, poly_width, 10, poly_color, 0, 5, 1, 55);
@@ -183,21 +186,18 @@ function latency_gump_creator() {
 // const DPS_FILE_PATH = Player.Name() + "_dps.log";
 function watch_dps() {
     const _regex = /(\d\d?\d?)/g;
+    const RESET_TIMER = 30 * 1000;
     var _total_dmg = 0;
     var _time_window = Orion.Now();
-    Orion.Print('hi');
-    // Orion.WaitJournal('pattern', startTime, endTime, 'flags', 'serial', 'color');
-    // flag mobile color = 0x0487
     while (true) {
-        if (Orion.Now() - _time_window > 30 * 1000) {
-            // Orion.Print('reset dps')
+        if (Orion.Now() - _time_window > RESET_TIMER) { // reset dps from time to time
             _time_window = Orion.Now();
             _total_dmg = 0;
         }
         Orion.Wait(10);
         if (_msg = Orion.WaitJournal('', Orion.Now() - 5, Orion.Now() + 10000, 'mobile', '', '0x0487')) {
             var _matches = _msg.Text().match(_regex);
-            if (!_matches) continue;
+            if (!_matches.length) continue;
             var _dmg = parseInt(_matches[0]);
             if (isNaN(_dmg)) {
                 Orion.Print('[ERROR] _dmg is NaN, strange, found string = ' + _matches[0]);
@@ -205,18 +205,15 @@ function watch_dps() {
             }
             _total_dmg += _dmg;
             _dps = parseFloat(_total_dmg / ((Orion.Now() - _time_window) / 1000)).toFixed(2)
-            // Orion.Print('total = ' + _total_dmg + ' dps = ' + _dps);
             process_progress_bar(1489, _dps, DPS_MAX, 14891, DMG_POLY_X, DMG_POLY_Y, 148911, ' dmg/s', 10, 25, 148912, 'total: '+_total_dmg, 95, 25);
         }
     }
 }
-//(gump_id, val, val_max, polygon_id, text_1_id, text_2_id, text_1_suffix, text2 )
-//10, 10
+
 function process_progress_bar(gump_id, val, val_max, 
     polygon_id, polygon_x, polygon_y,
     text_1_id, text_1_suffix, text_1_x, text_1_y,
     text_2_id, text_2, text_2_x, text_2_y ){
-    //const val_max = 1000;
     const width_max = 180;
     const green = '#66ff66';
     const yellow = '#ffff00';
@@ -253,6 +250,42 @@ function efficiency_gump_callback(unused) {
         var gump = Orion.CreateCustomGump(1489);
         gump.Close();
     }
+    if (code == 1) {
+        var gump = Orion.CreateCustomGump(1489);
+        Orion.Print('reset exp')
+        rewrite_file(EXP_FILE_PATH, 0);
+        process_progress_bar(1489, 0, EXP_PER_MIN_MAX, 14892, EXP_POLY_X, EXP_POLY_Y, 148921, ' exp/min', 10, 25+EXP_POLY_Y-DMG_POLY_X, 148922, 'reseted', 95, 25+EXP_POLY_Y-DMG_POLY_X);
+    }
+}
+
+function gump_watch() {
+    const POST_TO_DISCORD = false; // obvious
+    const POST_TO_TELEGRAM = true; // also
+    IGNORED_GUMP_TEXT = 'ZHE PvP/PvM Stats|SKILLS'; // all the gumps, containing the text will not raise alert
+    var _i;
+    var gump;
+    var _message = 'none'; 
+    var _sent = '';
+    while (true) {
+        Orion.Wait(500);
+        for (_i=0; _i<Orion.GumpCount();_i++) {
+            Orion.Print('gump #'+_i);
+            gump = Orion.GetGump(_i);
+            if (!gump) continue;
+            if (!gump.Replayed()) {
+                if (Orion.Contains(gump.TextList(), IGNORED_GUMP_TEXT) ) {
+                    continue;
+                }
+                if (_message != _sent) { 
+                    Orion.InfoGump(_i);
+                    _message = '⚠️ GUMP alert. \n Serial: {'+gump.Serial()+'} \n ID: {'+gump.ID()+'} \nText:\n'+gump.TextList();
+                    if (POST_TO_DISCORD) discord_post(_message);
+                    if (POST_TO_TELEGRAM) telegram_post(_message);
+                    _sent = _message;
+                }
+            }
+        }
+    }
 }
 
 const DMG_POLY_X = 10;
@@ -262,14 +295,17 @@ const EXP_POLY_Y = 50;
 const GOLD_POLY_X = 10;
 const GOLD_POLY_Y = 90;
 function efficiency_gump_creator() {
-    var gump = Orion.CreateCustomGump(1489); // Create new custom gump with serial 1488
+    var gump = Orion.CreateCustomGump(1489); // Create new custom gump with serial 1489
     gump.SetNoClose(true); 	// This gump will be no closable by a right mouse click
     gump.Clear(); // Clear gump cpntents (for rebuilds)
     gump.SetCallback('efficiency_gump_callback'); // Set callback function
-    gump.AddResizepic(0, 0, '13BE', 200, 150);  // Main background
-    gump.AddButton(0, 170, 123, '0x00FC', '0x00FD', '0x00FD', '0')
-    var poly_color = 400;
-    var poly_width = 180;
+    gump.AddResizepic(0, 0, '0x24EA', 200, 150);  // Main background 
+    // 13BE DB0 E10 0x1400 0x23f0 0x2422 0x2436 0x2454 0x2486 0x24EA
+    gump.AddButton(0, 170, 123, '0x5686', '0x5687', '0x5688', '0') // close button 0x5686
+    gump.AddButton(1, 0, 120, '0x5666', '0x5667', '0x5668', '0') // reset button 0x5666
+    // gump.AddTextEntry(2, 20, 123, '0xFFFF', 'reset exp', 100, 50, 20);
+    const poly_color = 400;
+    const poly_width = 180;
     gump.AddColoredPolygone(DMG_POLY_X, DMG_POLY_Y, poly_width, 10, poly_color, 0, 5, 1, 14891);
     gump.AddColoredPolygone(EXP_POLY_X, EXP_POLY_Y, poly_width, 10, poly_color, 0, 5, 1, 14892);
     gump.AddColoredPolygone(GOLD_POLY_X, GOLD_POLY_Y, poly_width, 10, poly_color, 0, 5, 1, 14893);
