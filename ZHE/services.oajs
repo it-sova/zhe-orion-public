@@ -269,7 +269,7 @@ function gump_watch() {
     while (true) {
         Orion.Wait(500);
         for (_i=0; _i<Orion.GumpCount();_i++) {
-            Orion.Print('gump #'+_i);
+            // Orion.Print('gump #'+_i);
             gump = Orion.GetGump(_i);
             if (!gump) continue;
             if (!gump.Replayed()) {
