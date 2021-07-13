@@ -27,7 +27,7 @@ function item_id() {
                     flag = true;
                     Orion.TargetObject(items[i])
                     //if ( !Orion.InJournal(item_delay_msg, '', 0, 'any', Orion.Now() - 500) ) 
-                    Orion.Wait(7000);
+                    Orion.Wait(10000);
                 }
             }
         }
@@ -265,23 +265,24 @@ function parrying() {
 function weapon_changer() {
     const hammer_type = 0x13E3; // wooden hammer
     const dagger_type = 0x0EC4; // wooden skinning knife
+    var _holding;
+    const NEED_MACEFIGHTING = false;
     while (true) {
-        if (!Orion.ObjAtLayer('RightHand') && !Player.Dead()) {
-            Orion.DropDraggedItem('backpack');
-            Orion.Wait(750);
-            Orion.EquipT(hammer_type);
-            Orion.Wait(750);
+        Orion.Wait(100);
+        if (Orion.ObjAtLayer('RightHand')==null) {
+            _holding = 0;
+        } else {
+            _holding = Orion.ObjAtLayer('RightHand').Graphic();
         }
-        if (!Orion.ObjAtLayer('RightHand'))
-        if (Orion.ObjAtLayer('RightHand').Graphic() == hammer_type && Player.Stam() < 5) {
+        if ( _holding != dagger_type && (Player.Stam() < 5 || !NEED_MACEFIGHTING)) {
             Orion.DropDraggedItem('backpack');
             Orion.Wait(750);
             Orion.Unequip('RightHand');
             Orion.Wait(750);
-            // Orion.EquipT(dagger_type);
-            // Orion.Wait(750);
+            Orion.EquipT(dagger_type);
+            Orion.Wait(750);
         }
-        if (!Orion.ObjAtLayer('RightHand').Graphic() == hammer_type && Player.Stam() > 40) {
+        if ( _holding != hammer_type && Player.Stam() > 40 && NEED_MACEFIGHTING) {
             Orion.DropDraggedItem('backpack');
             Orion.Wait(750);
             Orion.Unequip('RightHand');

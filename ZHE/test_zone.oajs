@@ -1,33 +1,126 @@
-function test_list_loot() {
-    // Orion.WaitForAddObject('test_item');
-    // test_item = Orion.FindObject('test_item')
-    loot_list = Orion.GetFindList(LOOT_FINDLIST);
-    if (loot_list) {
-        loot_list_items = loot_list.Items();
-        for (i = 0; i < loot_list_items.length; i++) {
-            Orion.Print(loot_list_items[i].Graphic())
+
+// anti-macro gump
+// Gump information:
+// Serial=0x0027F43B
+// ID=0x0A3635D0
+// X=0
+// Y=0
+
+// Gump buttons:
+// [1]	 button 235 367 2128 2129 1 0 1 
+
+// Gump checks & radios: order is the same as for text
+// [2001]	 radio 170 307 5002 5003 1 2001 
+// [2002]	 radio 170 327 5002 5003 0 2002 
+// [2003]	 radio 170 347 5002 5003 0 2003 
+
+// Gump entries:
+
+// Gump all commands:
+//  page 0 
+//  noclose 
+//  nomove 
+//  nodispose 
+//  resizepic 155 217 8192 250 180 
+//  button 235 367 2128 2129 1 0 1 
+//  text 170 232 32 0 
+//  text 170 257 995 1 
+//  text 170 272 995 2 
+//  text 170 287 995 3 
+//  radio 170 307 5002 5003 1 2001 
+//  radio 170 327 5002 5003 0 2002 
+//  radio 170 347 5002 5003 0 2003 
+//  text 195 307 52 4 
+//  text 195 327 43 5 
+//  text 195 347 56 6 
+
+// Gump text: order is the same as for radio
+// [0]	This is a check for macroing.
+// [1]	You have 5 minutes to select
+// [2]	the option 14100 before you
+// [3]	will be jailed.
+// [4]	3536
+// [5]	15462
+// [6]	14100
+
+// function GeneratedScript_111155()
+// {
+// 	if (Orion.WaitForGump(1000))
+// 	{
+// 		var gump0 = Orion.GetGump('last');
+// 		if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x0A3635D0'))
+// 		{
+// 			var gumpHook0 = Orion.CreateGumpHook(1);
+// 			gumpHook0.AddCheck(2003, true);
+// 			gumpHook0.AddCheck(2001, false);
+// 			gump0.Select(gumpHook0);
+// 			Orion.Wait(100);
+// 		}
+// 	}
+// }
+
+function list_gumps()
+{
+    for (var _i=0; _i<Orion.GumpCount();_i++) {
+        Orion.Print('gump #'+_i);
+        var gump = Orion.GetGump(_i);
+        if (!gump) return
+        if (!gump.Replayed()) {
+            Orion.Print('Found the gump'+gump.ID());
+            Orion.Print('Serial = '+gump.Serial());
+            Orion.Print('TextList = '+gump.TextList() );
+            Orion.Print('TextList len = '+gump.TextList().length );
+            Orion.Print('ButtonList = '+gump.ButtonList() );
+            Orion.Print('CheckboxList = '+gump.CheckboxList() );
+            Orion.Print('CommandList = '+gump.CommandList() );
+            Orion.Print('TilepicList = '+gump.TilepicList() );
+            Orion.Print('RadioList = '+gump.RadioList() );
+            
         }
-    } else {
-        Orion.Print('ERROR: no such findlist {' + LOOT_FINDLIST + '}');
     }
-
 }
 
-function test_list_lookup() {
-    Orion.WaitForAddObject('test_item');
-    test_item = Orion.FindObject('test_item')
-    loot_list = Orion.GetFindList(LOOT_FINDLIST);
-    loot_list_items = loot_list.Items();
-    if (value_in_array(test_item.Graphic(), loot_list_items.Graphic())) {
-        Orion.Print('take it!')
-    } else {
-        Orion.Print('thats sh1t')
+function find_gump(gump_id)
+{
+    for (var _i=0; _i<Orion.GumpCount();_i++) {
+        //Orion.Print('_i='+_i);
+        var gump = Orion.GetGump(_i);
+        if (!gump) return
+        if (!gump.Replayed() && gump.ID() == gump_id ) {
+            Orion.Print('Found the gump');
+            return  gump;
+        }
     }
-
 }
 
 
+// function test_list_loot() {
+//     // Orion.WaitForAddObject('test_item');
+//     // test_item = Orion.FindObject('test_item')
+//     loot_list = Orion.GetFindList(LOOT_FINDLIST);
+//     if (loot_list) {
+//         loot_list_items = loot_list.Items();
+//         for (i = 0; i < loot_list_items.length; i++) {
+//             Orion.Print(loot_list_items[i].Graphic())
+//         }
+//     } else {
+//         Orion.Print('ERROR: no such findlist {' + LOOT_FINDLIST + '}');
+//     }
 
+// }
+
+// function test_list_lookup() {
+//     Orion.WaitForAddObject('test_item');
+//     test_item = Orion.FindObject('test_item')
+//     loot_list = Orion.GetFindList(LOOT_FINDLIST);
+//     loot_list_items = loot_list.Items();
+//     if (value_in_array(test_item.Graphic(), loot_list_items.Graphic())) {
+//         Orion.Print('take it!')
+//     } else {
+//         Orion.Print('thats sh1t')
+//     }
+
+// }
 
 //function ttimer() {
 //  const TIMER_X = 1175

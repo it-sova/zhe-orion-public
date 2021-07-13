@@ -49,10 +49,15 @@ function save_to_file(path, data) {
     _file.Close();
 }
 
-function load_from_file(path) {
+function load_from_file(path, noint) {
     var _file = Orion.NewFile();
     _file.Open(path);
-    var result = parseInt(_file.Read());
+    var noint = typeof noint !== "undefined" ? noint : false;
+    if (!noint) {
+        var result = parseInt(_file.Read());
+    } else {
+        var result = _file.Read();
+    }
     _file.Close();
     return result;
 }
@@ -61,4 +66,21 @@ function rewrite_file(path, val) {
     _gold_file = Orion.NewFile(path)
     _gold_file.Remove(path);
     save_to_file(path, val);
+}
+
+// Telegram
+function telegram_post(message) {
+    const TELEGRAM_TOKEN = load_from_file('OA/.telegram-token', true);
+    const CHAT_ID = load_from_file('OA/.telegram-chatid');
+    if (!TELEGRAM_TOKEN || !CHAT_ID) { 
+        Orion.Print('[ERROR] Telegram token and/or chat_id not found.')
+        Orion.Print('TELEGRAM_TOKEN = '+ TELEGRAM_TOKEN)
+        Orion.Print('CHAT_ID = '+ CHAT_ID)
+        return;
+    }
+    const bot = "https://api.telegram.org/bot"+TELEGRAM_TOKEN+"/sendMessage";
+    const paramID = "chat_id=" + CHAT_ID;
+    const paramText = "text=";
+    const params = paramID + "&" + paramText;
+    Orion.HttpPost(bot, params + message);
 }
