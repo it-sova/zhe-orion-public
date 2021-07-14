@@ -1,12 +1,7 @@
 function cut_corpses() {
     var blade_types = '0x0F51|0x13FE';
-    // Orion.IgnoreReset();    
-    // Orion.ResetIgnoreList();
-    // Orion.ClearIgnoreList('');
-    // Orion.UseIgnoreList('');
     // if (Orion.FindType(blade_types).length) {
         var corpses = Orion.FindTypeEx("0x2006|0x0ECC", "any", "ground", "ignoreself|item", 3);
-        // var corpses = Orion.FindType("0x2006|0x0ECC", "any", "ground", "ignoreself|item", 3);
         if (corpses.length) {
             var corpses_remaining = corpses.length;
             corpses.forEach(function (corpse) {
