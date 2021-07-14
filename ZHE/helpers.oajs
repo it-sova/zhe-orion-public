@@ -24,19 +24,23 @@ function cut_corpses_script() {
                         if (corpse != corpses[corpses.length-1]) {
                             corpses_remaining--;
                             self_print('Corpses remaining: '+corpses_remaining, 1260);
-                            if ( !Orion.DisplayTimerExists('skinning') ) {
-                                add_skinning_timer((corpses_remaining-1)*2200+500);
-                            }
                             Orion.Wait(2000);
                         }
                         break;
                     } else { 
                         Orion.Print('Used blade, but haven\'t recieved a target');
+                        Orion.Wait(300);
                     }
                     Orion.Wait(100);
+                    if ( !Orion.DisplayTimerExists('skinning') ) {
+                        add_skinning_timer((corpses_remaining-1)*2200+500);
+                    }
                 }
                 
             });
+        }
+        while ( Orion.DisplayTimerExists('skinning') ) {
+            Orion.Wait(50);
         }
         Orion.CharPrint(Player.Serial(), 0x031, "No corpses aroud, buddy");
     //}
