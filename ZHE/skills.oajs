@@ -40,7 +40,7 @@ function item_id() {
 
 function taste_id() {
     // total skill time delay = 5000;
-    const items = Orion.FindType(0x097B,'any','backpack')
+    const items = Orion.FindType(0x09F2,'any','backpack')
     var _skill_time;
     var _total_skill_time = 0;
     var flag;
