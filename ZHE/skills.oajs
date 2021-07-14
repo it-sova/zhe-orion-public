@@ -1,3 +1,7 @@
+function skills_________zone() {
+    Orion.Print('this is delimiter, sorry')
+}
+
 function item_id() {
     // total skill time delay = 5000;
     const items = [0x4C17B5E9, 0x4C17F98A, 0x4C17B5F2, 0x4C17B5EA, 0x4C17B5EB]
@@ -363,6 +367,28 @@ function anatomy() {
                     Orion.TargetObject(_target);
                     Orion.WaitJournal(
                         "not sure|somewhat|Stamina",
+                        Orion.Now(),
+                        Orion.Now() + 1000
+                    );
+                    Orion.Wait(12 * 1000);
+                }
+            }
+        });
+    }
+}
+
+function eval_int() {
+    var targets = [];
+
+    while (!Player.Dead()) {
+        targets = Orion.FindType('any', 'any', 'ground', 'mobile|ignoreself', '4', '3');
+        targets.forEach(function (_target) {
+            if (Orion.ObjectExists(_target)) {
+                Orion.UseSkill("Evaluating Intelligence");
+                if (Orion.WaitForTarget()) {
+                    Orion.TargetObject(_target);
+                    Orion.WaitJournal(
+                        "not sure|somewhat|Average|About",
                         Orion.Now(),
                         Orion.Now() + 1000
                     );
