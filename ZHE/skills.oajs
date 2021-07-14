@@ -34,6 +34,42 @@ function item_id() {
     }
 }
 
+function taste_id() {
+    // total skill time delay = 5000;
+    const items = Orion.FindType(0x097B,'any','backpack')
+    var _skill_time;
+    var _total_skill_time = 0;
+    var flag;
+    const general_skill_delay_msg = 'You must wait to perform another action'
+    const item_delay_msg = 'You have to wait to identify again'
+    while (!Player.Dead()) {
+        for (i = 0; i < items.length; i++) {
+            flag = false;
+            while (!flag) {
+                Orion.UseSkill('Taste Identification');
+                _skill_time = 0;
+                while (!Orion.HaveTarget() && _skill_time < 1000) {
+                    Orion.Wait(200);
+                    _skill_time += 200;
+                    //JournalMessage Orion.InJournal('pattern', 'flags', 'serial', 'color', startTime, endTime);
+                    if (Orion.InJournal(general_skill_delay_msg, '', 0, 'any', Orion.Now() - _skill_time)) {
+                        _total_skill_time += _skill_time;
+                        break;
+                    }
+                }
+                if (Orion.HaveTarget()) {
+                    Orion.Print('_skill_time = ' + _total_skill_time);
+                    _total_skill_time = 0;
+                    flag = true;
+                    Orion.TargetObject(items[i])
+                    //if ( !Orion.InJournal(item_delay_msg, '', 0, 'any', Orion.Now() - 500) ) 
+                    Orion.Wait(10000);
+                }
+            }
+        }
+    }
+}
+
 function ss_with_dispel() {
     const fail_msg = 'You fail to communicate with the netherworld.';
     const succ_msg = 'You contact the netherworld';

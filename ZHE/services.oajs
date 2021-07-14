@@ -20,8 +20,8 @@ function loot_new_age() {
                     Orion.Wait(100);
                     contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
                     if (_get_content_try > 3) {
-                        Orion.Print('Corpse: no content.')
-                        Orion.CharPrint(corpse[c].Serial(), 70, 'No content.');
+                        // Orion.Print('Corpse: no content.')
+                        // Orion.CharPrint(corpse[c].Serial(), 70, 'No content.');
                         Orion.Ignore(corpse[c].Serial());
                         break
                     }
@@ -261,7 +261,7 @@ function efficiency_gump_callback(unused) {
 function gump_watch() {
     const POST_TO_DISCORD = false; // obvious
     const POST_TO_TELEGRAM = true; // also
-    IGNORED_GUMP_TEXT = 'ZHE PvP/PvM Stats|SKILLS'; // all the gumps, containing the text will not raise alert
+    IGNORED_GUMP_TEXT = 'ZHE PvP/PvM Stats|SKILLS|Choose your Class'; // all the gumps, containing the text will not raise alert
     var _i;
     var gump;
     var _message = 'none'; 
@@ -335,7 +335,7 @@ function watch_exp() {
                 }
                 _current_exp += _exp_gained;
                 // Orion.Print('Total exp gained: ' + _current_exp);
-                _exp_per_min = parseFloat(_current_exp / (Orion.Now() - _watch_begin_time / 1000 / 60)).toFixed(2);
+                _exp_per_min = parseFloat(_current_exp / ( (Orion.Now() - _watch_begin_time) / 1000 / 60)).toFixed(0);
                 process_progress_bar(1489, _exp_per_min, EXP_PER_MIN_MAX, 14892, EXP_POLY_X, EXP_POLY_Y, 148921, ' exp/min', 10, 25+EXP_POLY_Y-DMG_POLY_X, 148922, 'total: '+_current_exp, 95, 25+EXP_POLY_Y-DMG_POLY_X);
                 save_to_file(EXP_FILE_PATH, _current_exp);
             }
