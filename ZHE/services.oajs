@@ -1,14 +1,21 @@
+function services_________zone() {
+    Orion.Print('this is delimiter, sorry')
+}
 function loot_new_age() {
     // TODO: if no 'loot_bag' set in objects, use backpack with warning
     var contents;
     var corpse;
     var _get_content_try;
     var contents_from_loot_list;
-    Orion.IgnoreReset();
+    var ignored_corpses = [];
     while (true) {
         while (Player.Dead()) Orion.Wait(100);
         corpse = Orion.FindTypeEx("0x2006|0x0ECC", "any", "ground", "ignoreself|item", 3);
+        while (ignored_corpses.length > 50) {
+            ignored_corpses.shift();
+        }
         for (var c = 0; c < corpse.length; c++) {
+            if (  value_in_array(corpse[c].Serial(), ignored_corpses)  ) continue;
             if (Player.Dead()) break;
             if (true) {
                 Orion.OpenContainer(corpse[c].Serial())
@@ -21,8 +28,8 @@ function loot_new_age() {
                     contents = Orion.FindTypeEx("any", "any", corpse[c].Serial(), "item");
                     if (_get_content_try > 3) {
                         // Orion.Print('Corpse: no content.')
-                        // Orion.CharPrint(corpse[c].Serial(), 70, 'No content.');
-                        Orion.Ignore(corpse[c].Serial());
+                        Orion.CharPrint(corpse[c].Serial(), 70, 'No content.');
+                        ignored_corpses.push(corpse[c].Serial());
                         break
                     }
                 }
@@ -35,7 +42,7 @@ function loot_new_age() {
                         safe_move(contents_from_loot_list[_i].Serial(), 'loot_bag');
                         if (!Orion.InLOS(corpse[c].Serial())) {
                             Orion.CharPrint(corpse[c].Serial(), 70, 'Not in LOS!');
-                            Orion.Ignore(corpse[c].Serial());
+                            ignored_corpses.push(corpse[c].Serial());
                             break;
                         }
                     }
@@ -51,13 +58,13 @@ function loot_new_age() {
                         safe_move(contents[_i].Serial(), 'loot_bag');
                         if (!Orion.InLOS(corpse[c].Serial())) {
                             Orion.CharPrint(corpse[c].Serial(), 70, 'Not in LOS!');
-                            Orion.Ignore(corpse[c].Serial());
+                            ignored_corpses.push(corpse[c].Serial());
                             break;
                         }
                     }
                 }
                 Orion.Wait(10);
-                Orion.Ignore(corpse[c].Serial());
+                ignored_corpses.push(corpse[c].Serial());
             } else {
                 Orion.Print('failed to open');
                 Orion.Wait(10);
@@ -76,11 +83,14 @@ function watch_durability() {
 }
 
 function watch_death() {
+    const POST_TO_DISCORD = true; // obvious
+    const POST_TO_TELEGRAM = true; // also
     while (true) {
         while (!Player.Dead()) {
             Orion.Wait(5000)
         }
-        discord_post(' :cry: Dead at X: ' + Player.X() + ' Y: ' + Player.Y());
+        if (POST_TO_TELEGRAM) telegram_post(' 😢 Dead at X: ' + Player.X() + ' Y: ' + Player.Y());
+        if (POST_TO_DISCORD) discord_post(' 😢 Dead at X: ' + Player.X() + ' Y: ' + Player.Y());
         while (Player.Dead()) {
             Orion.Wait(5000)
         }

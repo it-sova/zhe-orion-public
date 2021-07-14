@@ -1,3 +1,44 @@
+function cut_corpses() {
+    var blade_types = '0x0F51|0x13FE';
+    // if (Orion.FindType(blade_types).length) {
+        var corpses = Orion.FindTypeEx("0x2006|0x0ECC", "any", "ground", "ignoreself|item", 3);
+        if (corpses.length) {
+            var corpses_remaining = corpses.length;
+            corpses.forEach(function (corpse) {
+                if (Orion.HaveTarget()) Orion.CancelTarget();
+                var started = Orion.Now();
+                var _try = 0;
+                while (!Orion.HaveTarget() && _try < 4) {
+                    _try++;
+                    Orion.UseType(blade_types);
+                    Orion.WaitJournal('What would you like to use that on', started-10, Orion.Now() + 100);
+                    Orion.WaitForTarget(500);
+                    if (Orion.HaveTarget()) {
+                        Orion.TargetObject(corpse.Serial());
+                        Orion.WaitJournal("You carve|pity|You cut|You cannot|nothing|next time", started, Orion.Now() + 2000);
+                        if (corpse != corpses[corpses.length-1]) {
+                            corpses_remaining--;
+                            self_print('Corpses remaining: '+corpses_remaining, 1260);
+                            Orion.Wait(2000);
+                        }
+                        break;
+                    } else { 
+                        Orion.Print('Used blade, but haven\'t recieved a target');
+                    }
+                    Orion.Wait(100);
+                }
+                
+            });
+        }
+        Orion.CharPrint(Player.Serial(), 0x031, "No more corpses left");
+    //}
+    //else {
+    //    Orion.Print("You have no dagger! Go kill yourself");
+    //}
+
+}
+
+
 function hungry(level) {
     var level = typeof level !== "undefined" ? level : 90;
     var _food_count = 0;

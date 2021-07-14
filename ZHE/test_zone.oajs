@@ -1,4 +1,15 @@
+function test_________zone() {
+    Orion.Print('this is delimiter, sorry')
+}
 
+// function test_arr() {
+//     var arr = [1,2,3];
+//     Orion.Print('arr = '+arr);
+//     arr.push(4);
+//     arr.shift();
+//     Orion.Print('arr push '+arr);
+
+// }
 // anti-macro gump
 // Gump information:
 // Serial=0x0027F43B
