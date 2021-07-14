@@ -1,9 +1,14 @@
 function cut_corpses() {
+        Orion.Exec('cut_corpses_script', true);
+}
+
+function cut_corpses_script() {
     var blade_types = '0x0F51|0x13FE';
     // if (Orion.FindType(blade_types).length) {
         var corpses = Orion.FindTypeEx("0x2006|0x0ECC", "any", "ground", "ignoreself|item", 3);
         if (corpses.length) {
             var corpses_remaining = corpses.length;
+            add_skinning_timer((corpses_remaining-1)*2200+500);
             corpses.forEach(function (corpse) {
                 if (Orion.HaveTarget()) Orion.CancelTarget();
                 var started = Orion.Now();
@@ -19,6 +24,9 @@ function cut_corpses() {
                         if (corpse != corpses[corpses.length-1]) {
                             corpses_remaining--;
                             self_print('Corpses remaining: '+corpses_remaining, 1260);
+                            if ( !Orion.DisplayTimerExists('skinning') ) {
+                                add_skinning_timer((corpses_remaining-1)*2200+500);
+                            }
                             Orion.Wait(2000);
                         }
                         break;
@@ -30,7 +38,7 @@ function cut_corpses() {
                 
             });
         }
-        Orion.CharPrint(Player.Serial(), 0x031, "No more corpses left");
+        Orion.CharPrint(Player.Serial(), 0x031, "No corpses aroud, buddy");
     //}
     //else {
     //    Orion.Print("You have no dagger! Go kill yourself");
@@ -38,6 +46,11 @@ function cut_corpses() {
 
 }
 
+function add_skinning_timer(msec) {
+    Orion.AddDisplayTimer("skinning", msec, "custom", "LineBar", "Skinning...", SKINNING_TIMER_X, SKINNING_TIMER_Y);
+    Orion.DisplayTimerSetIcon("skinning", "Left", "0x122A");
+    Orion.DisplayTimerSetSize("skinning", 100, 30);
+}
 
 function hungry(level) {
     var level = typeof level !== "undefined" ? level : 90;

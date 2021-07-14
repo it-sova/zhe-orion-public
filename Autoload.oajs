@@ -11,6 +11,8 @@ const CLEAN_BANDAGES = 0x0e21;
 const HEALING_THRESHOLD = 95; // Health % to start healing
 const HEALING_TIMER_X = 1175;
 const HEALING_TIMER_Y = 550;
+const SKINNING_TIMER_X = 1175;
+const SKINNING_TIMER_Y = 600;
 //// Healing SETTINGS////
 
 //// MISC SETTINGS ////
