@@ -2,6 +2,22 @@ function skills_________zone() {
     Orion.Print('this is delimiter, sorry')
 }
 
+function meditation_robe() {
+while (!Player.Dead()) {
+   if (!Orion.ObjAtLayer('Robe')) {
+       Orion.Equip('0x4C187901');
+       Orion.Wait(500);
+       Orion.UseSkill('Meditation');
+       Orion.Wait(5000);
+   } else {
+       Orion.Unequip('Robe');
+       Orion.Wait(500);
+   }
+   Orion.Wait(100);
+}
+
+}
+
 function item_id() {
     // total skill time delay = 5000;
     const items = [0x4C17B5E9, 0x4C17F98A, 0x4C17B5F2, 0x4C17B5EA, 0x4C17B5EB]
@@ -305,8 +321,11 @@ function parrying() {
 function weapon_changer() {
     const hammer_type = 0x13E3; // wooden hammer
     const dagger_type = 0x0EC4; // wooden skinning knife
+    const cleaver_type = 0x13F6; // wooden butcher knife
     var _holding;
     const NEED_MACEFIGHTING = false;
+    const NEED_SWORDS = false;
+    const NEED_FENCING = true;
     while (true) {
         Orion.Wait(100);
         if (Orion.ObjAtLayer('RightHand')==null) {
@@ -314,7 +333,7 @@ function weapon_changer() {
         } else {
             _holding = Orion.ObjAtLayer('RightHand').Graphic();
         }
-        if ( _holding != dagger_type && (Player.Stam() < 5 || !NEED_MACEFIGHTING)) {
+        if ( _holding != dagger_type && (Player.Stam() < 5 || !NEED_MACEFIGHTING) && NEED_FENCING) {
             Orion.DropDraggedItem('backpack');
             Orion.Wait(750);
             Orion.Unequip('RightHand');
@@ -328,6 +347,14 @@ function weapon_changer() {
             Orion.Unequip('RightHand');
             Orion.Wait(750);
             Orion.EquipT(hammer_type);
+            Orion.Wait(750);
+        }
+        if (_holding != cleaver_type && NEED_SWORDS) {
+            Orion.DropDraggedItem('backpack');
+            Orion.Wait(750);
+            Orion.Unequip('RightHand');
+            Orion.Wait(750);
+            Orion.EquipT(cleaver_type);
             Orion.Wait(750);
         }
     }
@@ -388,7 +415,7 @@ function eval_int() {
                 if (Orion.WaitForTarget()) {
                     Orion.TargetObject(_target);
                     Orion.WaitJournal(
-                        "not sure|somewhat|Average|About",
+                        "not sure|somewhat|Average|About|being|mental",
                         Orion.Now(),
                         Orion.Now() + 1000
                     );

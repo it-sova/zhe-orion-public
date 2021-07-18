@@ -3,12 +3,13 @@ function cut_corpses() {
 }
 
 function cut_corpses_script() {
-    var blade_types = '0x0F51|0x13FE';
+    var blade_types = '0x0F51|0x13FE|0x23A5|0x237E';
+    var cut_delay = 1200;
     // if (Orion.FindType(blade_types).length) {
         var corpses = Orion.FindTypeEx("0x2006|0x0ECC", "any", "ground", "ignoreself|item", 3);
         if (corpses.length) {
             var corpses_remaining = corpses.length;
-            add_skinning_timer((corpses_remaining-1)*2200+500);
+            add_skinning_timer((corpses_remaining-1)*(cut_delay+200)+500);
             corpses.forEach(function (corpse) {
                 if (Orion.HaveTarget()) Orion.CancelTarget();
                 var started = Orion.Now();
@@ -24,7 +25,7 @@ function cut_corpses_script() {
                         if (corpse != corpses[corpses.length-1]) {
                             corpses_remaining--;
                             self_print('Corpses remaining: '+corpses_remaining, 1260);
-                            Orion.Wait(2000);
+                            Orion.Wait(cut_delay);
                         }
                         break;
                     } else { 
@@ -33,7 +34,7 @@ function cut_corpses_script() {
                     }
                     Orion.Wait(100);
                     if ( !Orion.DisplayTimerExists('skinning') ) {
-                        add_skinning_timer((corpses_remaining-1)*2200+500);
+                        add_skinning_timer((corpses_remaining-1)*(cut_delay+200)+500);
                     }
                 }
                 

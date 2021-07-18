@@ -21,7 +21,7 @@ const LOOT_FINDLIST = 'loot_list'; // Name of findlist to search loot types in
 //// MISC SETTINGS ////
 
 //// EFFICIENCY GUMP SETTINGS ////
-const DPS_MAX = 10;
+const DPS_MAX = 16;
 const EXP_PER_MIN_MAX = 1000;
 const GP_PER_MIN_MAX = 1000;
 //// EFFICIENCY GUMP SETTINGS ////
@@ -51,6 +51,14 @@ function Autostart() {
         Orion.Exec(scripts_to_run[_sc], true);
     }
 }
+
+function walk_to() {
+   var x = 3761;
+   var y = 1323;
+   var z = 0;
+    Orion.WalkTo(x,y,z)
+}
+
 function reset_exp() {
     rewrite_file(EXP_FILE_PATH, 0);
 }
@@ -88,7 +96,7 @@ function attack_nts() {
 }
 
 function unwar() {
-    var shield = 0x1b76;
+    var shield = 0x1B74; //0x1b76;
     while (!Player.Dead()) {
         if (!Orion.ObjAtLayer("LeftHand")) {
             if (Orion.FindType(shield)) {

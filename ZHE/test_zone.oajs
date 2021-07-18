@@ -2,6 +2,11 @@ function test_________zone() {
     Orion.Print('this is delimiter, sorry')
 }
 
+function test_luck() {
+    Orion.Print('luck = '+Player.Luck());
+    hungry();
+}
+
 // function test_arr() {
 //     var arr = [1,2,3];
 //     Orion.Print('arr = '+arr);
